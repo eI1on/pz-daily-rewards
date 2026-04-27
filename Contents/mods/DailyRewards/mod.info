@@ -1,0 +1,7 @@
+name=[B41] Daily Rewards
+poster=poster.png
+id=DailyRewards
+description=Server-authoritative daily and streak rewards with in-game admin configuration and custom reward handlers.
+require=ElyonLib
+tags=Build 41,Misc,Multiplayer,Interface
+versionMin=41.0
