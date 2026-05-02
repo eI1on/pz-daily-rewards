@@ -1,4 +1,5 @@
 local Globals = require("ElyonLib/Core/Globals")
+local GrantUtils = require("ElyonLib/Rewards/GrantUtils")
 local Logger = require("DailyRewards/Logger")
 local DailyRewards = require("DailyRewards/Shared")
 
@@ -85,72 +86,18 @@ function Server.PushSnapshotToAll(message, level)
 end
 
 local function grantItemReward(player, reward, summaries, errors)
-    if not player or not player.getInventory then
-        errors[#errors + 1] = "Player inventory unavailable"
-        return
-    end
-
-    local itemType = tostring(reward.type or "")
-    local count = math.floor(tonumber(reward.count) or 1)
-    if itemType == "" or count <= 0 then
-        return
-    end
-
-    local scriptItem = ScriptManager.instance:getItem(itemType)
-    if not scriptItem then
-        errors[#errors + 1] = "Missing item " .. itemType
-        Logger:warning("Daily reward references missing item %s", itemType)
-        return
-    end
-
-    if Globals.isServer then
-        player:sendObjectChange("addItemOfType", { type = itemType, count = count })
-    else
-        for i = 1, count do
-            player:getInventory():AddItem(itemType)
+    local prevErrors = #errors
+    GrantUtils.grantItem(player, reward.type, reward.count, summaries, errors)
+    if #errors > prevErrors then
+        local newError = errors[#errors] or ""
+        if newError:find("Missing item") then
+            Logger:warning("Daily reward references missing item %s", tostring(reward.type))
         end
     end
-
-    summaries[#summaries + 1] = string.format("%dx %s", count, scriptItem:getDisplayName())
-end
-
-local function findPerk(perkName)
-    perkName = tostring(perkName or "")
-    if perkName == "" then
-        return nil
-    end
-
-    if Perks[perkName] then
-        return Perks[perkName]
-    end
-
-    if Perks.FromString then
-        local perk = Perks.FromString(perkName)
-        if perk and PerkFactory.getPerk(perk) then
-            return perk
-        end
-    end
-
-    return nil
 end
 
 local function grantXpReward(player, reward, summaries, errors)
-    if not player or not player.getXp then
-        errors[#errors + 1] = "Player XP unavailable"
-        return
-    end
-
-    local perk = findPerk(reward.perk)
-    local amount = tonumber(reward.amount) or 0
-    if not perk or amount == 0 then
-        errors[#errors + 1] = "Invalid XP reward " .. tostring(reward.perk)
-        return
-    end
-
-    player:getXp():AddXP(perk, amount)
-    local perkInfo = PerkFactory.getPerk(perk)
-    local perkName = perkInfo and perkInfo:getName() or tostring(reward.perk)
-    summaries[#summaries + 1] = string.format("%s XP +%s", perkName, tostring(amount))
+    GrantUtils.grantXp(player, reward.perk, reward.amount, summaries, errors)
 end
 
 local function grantTraitReward(player, reward, summaries, errors)

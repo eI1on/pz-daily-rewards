@@ -1,4 +1,12 @@
+if not pcall(require, "ElyonLib/Core/Globals") then
+    print("[DailyRewards] ERROR: ElyonLib is required but not loaded. DailyRewards will not function.")
+    return {}
+end
+
 local Globals = require("ElyonLib/Core/Globals")
+local AccessLevelUtils = require("ElyonLib/PlayerUtils/AccessLevelUtils")
+local PlayerUtils = require("ElyonLib/PlayerUtils/PlayerUtils")
+local NetUtils = require("ElyonLib/Net/NetUtils")
 local FileUtils = require("ElyonLib/FileUtils/FileUtils")
 local ItemUtils = require("ElyonLib/ItemUtils/ItemUtils")
 local JSON = require("ElyonLib/FileUtils/JSON")
@@ -158,7 +166,7 @@ local copyValue = TableUtils.deepCopy
 local normalizeNumber = MathUtils.parseNumber
 
 function Shared.GetPlayerUsername(player)
-    if player then
+    if player and player.getUsername then
         local username = player:getUsername()
         if username and username ~= "" then
             return username
@@ -168,77 +176,15 @@ function Shared.GetPlayerUsername(player)
 end
 
 function Shared.GetPlayerKey(player)
-    if not player then
-        return nil
-    end
-
-    local username = Shared.GetPlayerUsername(player)
-    if username and username ~= "" then
-        return username
-    end
-
-    if player.getOnlineID then
-        local onlineId = tonumber(player:getOnlineID())
-        if onlineId and onlineId >= 0 then
-            return "online-" .. tostring(onlineId)
-        end
-    end
-
-    return tostring(player)
+    return PlayerUtils.getPlayerKey(player)
 end
 
 function Shared.GetOnlinePlayers()
-    local result = {}
-    local seen = {}
-
-    if getOnlinePlayers then
-        local onlinePlayers = getOnlinePlayers()
-        if onlinePlayers then
-            for i = 0, onlinePlayers:size() - 1 do
-                local player = onlinePlayers:get(i)
-                local playerId = Shared.GetPlayerKey(player)
-                if playerId and not seen[playerId] then
-                    seen[playerId] = true
-                    result[#result + 1] = player
-                end
-            end
-        end
-    end
-
-    local localPlayer = getPlayer()
-    if localPlayer then
-        local playerId = Shared.GetPlayerKey(localPlayer)
-        if playerId and not seen[playerId] then
-            seen[playerId] = true
-            result[#result + 1] = localPlayer
-        end
-    end
-
-    table.sort(result, function(a, b)
-        return tostring(Shared.GetPlayerKey(a)):lower() < tostring(Shared.GetPlayerKey(b)):lower()
-    end)
-
-    return result
+    return PlayerUtils.getOnlinePlayers()
 end
 
 function Shared.PlayerHasAdminAccess(player)
-    if Globals.isSingleplayer then
-        return true
-    end
-
-    if player and player.getAccessLevel then
-        return tostring(player:getAccessLevel() or "") == "Admin"
-    end
-
-    if isAdmin and isAdmin() then
-        return true
-    end
-
-    if getAccessLevel then
-        return tostring(getAccessLevel() or "") == "Admin"
-    end
-
-    return false
+    return AccessLevelUtils.hasAdminAccess(player)
 end
 
 function Shared.NormalizeDateKey(value)
@@ -910,7 +856,8 @@ function Shared.GetRewardSummary(rewards)
 
     for i = 1, #rewards.traits do
         local traitInfo = Shared.GetTraitInfo(rewards.traits[i].type)
-        parts[#parts + 1] = string.format("Trait: %s", traitInfo and traitInfo.label or tostring(rewards.traits[i].type or "Trait"))
+        parts[#parts + 1] = string.format("Trait: %s",
+        traitInfo and traitInfo.label or tostring(rewards.traits[i].type or "Trait"))
     end
 
     for i = 1, #rewards.custom do
@@ -1005,25 +952,7 @@ function Shared.GetCustomRewardIcon(reward)
 end
 
 function Shared.ExecuteCommand(command, args)
-    args = args or {}
-
-    if Globals.isClient and not Globals.isServer then
-        sendClientCommand(DailyRewards.MODULE, command, args)
-        return true
-    end
-
-    local serverModule = require("DailyRewards/Server")
-    if not serverModule or not serverModule.Server or not serverModule.Server.ServerCommands then
-        return false
-    end
-
-    local handler = serverModule.Server.ServerCommands[command]
-    if type(handler) ~= "function" then
-        return false
-    end
-
-    handler(getPlayer(), args)
-    return true
+    return NetUtils.executeCommand(DailyRewards.MODULE, "DailyRewards/Server", command, args)
 end
 
 --[[

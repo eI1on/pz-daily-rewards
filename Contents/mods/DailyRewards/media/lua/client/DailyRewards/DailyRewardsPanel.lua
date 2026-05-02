@@ -7,6 +7,7 @@ require "ISUI/ISTickBox"
 
 local DailyRewards = require("DailyRewards/Shared")
 local ColorUtils = require("ElyonLib/ColorUtils/ColorUtils")
+local Theme = require("ElyonLib/UI/Theme/Theme")
 local DateTimeUtility = require("ElyonLib/DateTime/DateTimeUtility")
 local DateTimeSelector = require("ElyonLib/UI/Calendar/DateTimeSelector")
 local FileUtils = require("ElyonLib/FileUtils/FileUtils")
@@ -24,92 +25,104 @@ local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 
 local C = {
-    DEFAULT_W = 800,
-    DEFAULT_H = 650,
-    MIN_W = 750,
-    MIN_H = 650,
-    PAD = 10,
-    GAP = 8,
-    SMALL_GAP = 5,
-    MEDIUM_GAP = 10,
-    LARGE_GAP = 15,
-    TOP = 34,
-    BUTTON_H = 24,
-    FIELD_H = 24,
-    TAB_W = 120,
-    REFRESH_W = 100,
-    CLAIM_DAILY_W = 170,
-    CLAIM_STREAK_W = 180,
-    SETTINGS_BOX_W = 300,
-    SETTINGS_BOX_NARROW_W = 240,
-    SETTINGS_BOX_H = 80,
-    SETTINGS_FIELD_X = 330,
-    SETTINGS_FIELD_X_NARROW = 260,
-    SETTINGS_LABEL_W = 150,
-    SETTINGS_LABEL_W_NARROW = 120,
-    SETTINGS_ROW_GAP = 30,
-    SETTINGS_ROW_GAP_NARROW = 25,
-    SETTINGS_DATE_W = 100,
-    SETTINGS_VALUE_W = 70,
-    SETTINGS_PICK_W = 50,
-    PLAYER_SECTION_GAP = 50,
-    PLAYER_DETAIL_GAP = 16,
-    PLAYER_LIST_TITLE_GAP = 20,
-    STATUS_BAR_GAP = 16,
-    ADMIN_SECTION_GAP = 20,
-    ADMIN_LIST_W = 270,
-    ADMIN_LIST_W_COMPACT = 220,
-    ADMIN_LIST_W_NARROW = 180,
-    ADMIN_EDITOR_MIN_W = 390,
-    ADMIN_EDITOR_MIN_W_NARROW = 380,
-    ADMIN_SECTION_TITLE_GAP = 5,
-    ADMIN_BODY_GAP = 16,
-    ADMIN_BODY_GAP_NARROW = 20,
-    LABEL_OFFSET_Y = 3,
-    LABEL_ABOVE_GAP = 4,
-    SCROLLBAR_CLIP_PAD = 3,
-    LIST_TEXT_PAD = 8,
-    LIST_TEXT_RIGHT_PAD = 10,
-    LIST_ICON_PAD = 4,
-    LIST_ICON_TEXT_GAP = 6,
-    LIST_ICON_INSET = 8,
-    LIST_ICON_SIZE = 18,
-    DETAIL_TEXT_GAP = 4,
-    DETAIL_BLOCK_GAP = 8,
-    DETAIL_SECTION_GAP = 10,
-    ICON_TEXTURE_PAD = 2,
-    ICON_LABEL_PAD = 4,
-    ICON_LABEL_TEXT_PAD = 2,
-    TILE_TEXT_PAD = 6,
-    TILE_TOP_PAD = 5,
-    TILE_TITLE_Y = 25,
-    TILE_ICON_Y = 48,
-    TILE_TEXT_WIDTH_PAD = 12,
-    TILE_ICON_GAP = 4,
-    TILE_FOOTER_PAD = 6,
-    TILE_FOOTER_STACK_GAP = 7,
-    DAY_GRID_COLUMNS = 5,
-    DAY_GRID_MIN_COLUMNS = 4,
-    DAY_GRID_ROW = 112,
-    DAY_TILE_GAP = 6,
-    DAY_TILE_MIN_W = 104,
-    STREAK_ROW = 36,
-    ADMIN_REWARD_ROW = 42,
-    COLORS = {
-        BACKGROUND = { r = 0.06, g = 0.07, b = 0.07, a = 0.92 },
-        SECTION = { r = 0.10, g = 0.10, b = 0.10, a = 0.72 },
-        FIELD = { r = 0.13, g = 0.13, b = 0.13, a = 0.9 },
-        FIELD_DARK = { r = 0.08, g = 0.09, b = 0.09, a = 0.9 },
-        BORDER = { r = 0.55, g = 0.55, b = 0.55, a = 0.85 },
-        TEXT = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-        MUTED = { r = 0.75, g = 0.76, b = 0.76, a = 1.0 },
-        READY = { r = 0.48, g = 0.84, b = 0.42, a = 1.0 },
-        CLAIMED = { r = 0.55, g = 0.78, b = 0.92, a = 1.0 },
-        LOCKED = { r = 0.95, g = 0.72, b = 0.32, a = 1.0 },
-        ERROR = { r = 0.95, g = 0.44, b = 0.44, a = 1.0 },
-        SELECTED = { r = 0.25, g = 0.48, b = 0.58, a = 0.72 },
-        ALT = { r = 0.16, g = 0.16, b = 0.16, a = 0.55 }
-    }
+    SIZE = {
+        DEFAULT_W = 800,
+        DEFAULT_H = 650,
+        MIN_W = 750,
+        MIN_H = 650,
+    },
+    LAYOUT = {
+        PAD = 10,
+        GAP = 8,
+        GAP_S = 5,
+        GAP_M = 10,
+        GAP_L = 15,
+        TOP = 34,
+    },
+    CTRL = {
+        BUTTON_H = 24,
+        FIELD_H = 24,
+        TAB_W = 120,
+        REFRESH_W = 100,
+        CLAIM_DAILY_W = 170,
+        CLAIM_STREAK_W = 180,
+    },
+    SETTINGS = {
+        BOX_W = 300,
+        BOX_NARROW_W = 240,
+        BOX_H = 80,
+        FIELD_X = 330,
+        FIELD_X_NARROW = 260,
+        LABEL_W = 150,
+        LABEL_W_NARROW = 120,
+        ROW_GAP = 30,
+        ROW_GAP_NARROW = 25,
+        DATE_W = 100,
+        VALUE_W = 70,
+        PICK_W = 50,
+    },
+    PLAYER = {
+        SECTION_GAP    = 50,
+        DETAIL_GAP     = 16,
+        LIST_TITLE_GAP = 20,
+        STATUS_BAR_GAP = 16,
+    },
+    ADMIN = {
+        SECTION_GAP = 20,
+        LIST_W = 270,
+        LIST_W_COMPACT = 220,
+        LIST_W_NARROW = 180,
+        EDITOR_MIN_W = 390,
+        EDITOR_MIN_W_NARROW = 380,
+        SECTION_TITLE_GAP = 5,
+        BODY_GAP = 16,
+        BODY_GAP_NARROW = 20,
+        REWARD_ROW = 42,
+    },
+    LABEL = {
+        OFFSET_Y  = 3,
+        ABOVE_GAP = 4,
+    },
+    LIST = {
+        SCROLLBAR_CLIP_PAD = 3,
+        TEXT_PAD = 8,
+        TEXT_RIGHT_PAD = 10,
+        ICON_PAD = 4,
+        ICON_TEXT_GAP = 6,
+        ICON_INSET = 8,
+        ICON_SIZE = 18,
+    },
+    DETAIL = {
+        TEXT_GAP    = 4,
+        BLOCK_GAP   = 8,
+        SECTION_GAP = 10,
+    },
+    ICON = {
+        TEXTURE_PAD    = 2,
+        LABEL_PAD      = 4,
+        LABEL_TEXT_PAD = 2,
+    },
+    TILE = {
+        TEXT_PAD = 6,
+        TOP_PAD = 5,
+        TITLE_Y = 25,
+        ICON_Y = 48,
+        TEXT_WIDTH_PAD = 12,
+        ICON_GAP = 4,
+        FOOTER_PAD = 6,
+        FOOTER_STACK_GAP = 7,
+    },
+    GRID = {
+        COLUMNS = 5,
+        MIN_COLUMNS = 4,
+        ROW = 112,
+        TILE_GAP = 6,
+        TILE_MIN_W = 104,
+    },
+    STREAK = {
+        ROW = 36,
+    },
+    COLORS = Theme.standardColors(),
 }
 
 local ICON_CACHE = {
@@ -219,13 +232,13 @@ local copyValue = TableUtils.deepCopy
 local drawRewardIconTile
 
 local function calculateDailyTileWidth(contentWidth, columns)
-    return math.floor((contentWidth - C.DAY_TILE_GAP - (C.DAY_TILE_GAP * columns)) / columns)
+    return math.floor((contentWidth - C.GRID.TILE_GAP - (C.GRID.TILE_GAP * columns)) / columns)
 end
 
 local function getDailyGridColumnsForWidth(contentWidth)
-    local columns = C.DAY_GRID_COLUMNS
-    while columns > C.DAY_GRID_MIN_COLUMNS do
-        if calculateDailyTileWidth(contentWidth, columns) >= C.DAY_TILE_MIN_W then
+    local columns = C.GRID.COLUMNS
+    while columns > C.GRID.MIN_COLUMNS do
+        if calculateDailyTileWidth(contentWidth, columns) >= C.GRID.TILE_MIN_W then
             break
         end
         columns = columns - 1
@@ -234,26 +247,11 @@ local function getDailyGridColumnsForWidth(contentWidth)
 end
 
 local function applyButtonStyle(button, variant)
-    if not button then
-        return
-    end
-
-    button.borderColor = copyColor(C.COLORS.BORDER)
-    button.textColor = copyColor(C.COLORS.TEXT)
-    if variant == "primary" then
-        button.backgroundColor = { r = 0.19, g = 0.34, b = 0.40, a = 0.9 }
-        button.backgroundColorMouseOver = { r = 0.26, g = 0.45, b = 0.52, a = 0.95 }
-    elseif variant == "danger" then
-        button.backgroundColor = { r = 0.42, g = 0.16, b = 0.16, a = 0.9 }
-        button.backgroundColorMouseOver = { r = 0.56, g = 0.22, b = 0.22, a = 0.95 }
-    else
-        button.backgroundColor = { r = 0.18, g = 0.18, b = 0.18, a = 0.9 }
-        button.backgroundColorMouseOver = { r = 0.28, g = 0.28, b = 0.28, a = 0.95 }
-    end
+    Theme.applyButtonStyle(button, variant)
 end
 
 local function addButton(panel, x, y, w, text, internal, variant)
-    local button = ISButton:new(x, y, w, C.BUTTON_H, text, panel, DailyRewardsPanel.onClick)
+    local button = ISButton:new(x, y, w, C.CTRL.BUTTON_H, text, panel, DailyRewardsPanel.onClick)
     button.internal = internal
     button:initialise()
     button:instantiate()
@@ -263,21 +261,23 @@ local function addButton(panel, x, y, w, text, internal, variant)
 end
 
 local function applyListStyle(list)
-    list.backgroundColor = copyColor(C.COLORS.FIELD)
-    list.borderColor = copyColor(C.COLORS.BORDER)
+    Theme.applyListStyle(list)
     list.drawBorder = true
 end
 
 local function applyComboStyle(combo)
-    combo.backgroundColor = copyColor(C.COLORS.FIELD)
-    combo.backgroundColorMouseOver = { r = 0.22, g = 0.32, b = 0.38, a = 0.9 }
-    combo.borderColor = copyColor(C.COLORS.BORDER)
-    combo.textColor = copyColor(C.COLORS.TEXT)
+    if not combo then return end
+    local T                        = Theme.colors
+    combo.backgroundColor          = Theme.copy(T.panel)
+    combo.backgroundColorMouseOver = Theme.copy(T.primary)
+    combo.borderColor              = Theme.copy(T.border)
+    combo.textColor                = Theme.copy(T.text)
 end
 
 local function applyTickBoxStyle(tickBox)
-    tickBox.borderColor = copyColor(C.COLORS.BORDER)
-    tickBox.choicesColor = copyColor(C.COLORS.TEXT)
+    if not tickBox then return end
+    tickBox.borderColor  = Theme.copy(Theme.colors.border)
+    tickBox.choicesColor = Theme.copy(Theme.colors.text)
 end
 
 local function addEntry(panel, x, y, w, h, multiline, maxLines)
@@ -288,14 +288,13 @@ local function addEntry(panel, x, y, w, h, multiline, maxLines)
         entry:setMultipleLine(true)
         entry:setMaxLines(maxLines or 1000)
     end
-    entry.backgroundColor = copyColor(C.COLORS.FIELD)
-    entry.borderColor = copyColor(C.COLORS.BORDER)
+    Theme.applyFieldStyle(entry)
     panel:addChild(entry)
     return entry
 end
 
 local function addCombo(panel, x, y, w, onChange)
-    local combo = ISComboBox:new(x, y, w, C.FIELD_H, panel, onChange)
+    local combo = ISComboBox:new(x, y, w, C.CTRL.FIELD_H, panel, onChange)
     combo:initialise()
     combo:instantiate()
     applyComboStyle(combo)
@@ -333,7 +332,7 @@ local function getListStencilBounds(list, y, height)
     local clipX = list.drawBorder and 1 or 0
     local clipY = math.max(0, y + list:getYScroll())
     local clipX2 =
-        list:isVScrollBarVisible() and (list.vscroll.x + C.SCROLLBAR_CLIP_PAD) or
+        list:isVScrollBarVisible() and (list.vscroll.x + C.LIST.SCROLLBAR_CLIP_PAD) or
         (list:getWidth() - (list.drawBorder and 1 or 0))
     local clipY2 = math.min(list:getHeight() - (list.drawBorder and 1 or 0), y + height + list:getYScroll())
 
@@ -646,7 +645,7 @@ local function parseCustomLines(text)
         if handler ~= "" then
             local entry = { handler = handler }
             params = params or ""
-            for token in (params .. ";"):gmatch("(.-);") do
+            for token in (params .. ""):gmatch("(.-)") do
                 local key, value = token:match("^%s*([^=]+)%s*=%s*(.-)%s*$")
                 key = trim(key)
                 if key ~= "" then
@@ -691,7 +690,7 @@ local function formatCustom(rewards)
             parts[#parts + 1] = tostring(key) .. "=" .. tostring(custom[key])
         end
         if #parts > 0 then
-            lines[#lines + 1] = tostring(custom.handler or "") .. " | " .. table.concat(parts, "; ")
+            lines[#lines + 1] = tostring(custom.handler or "") .. " | " .. table.concat(parts, " ")
         else
             lines[#lines + 1] = tostring(custom.handler or "")
         end
@@ -717,29 +716,29 @@ end
 function DailyRewardsPanel:new(x, y, width, height, playerObj)
     local o = ISCollapsableWindow.new(self, x, y, width, height)
     setmetatable(o, self)
-    self.__index = self
+    self.__index               = self
 
-    o.playerObj = playerObj or getPlayer()
-    o.snapshot = DailyRewards.ClientSnapshot or {}
-    o.activeTab = "player"
-    o.statusMessage = getText("IGUI_DR_StatusLoading")
-    o.statusLevel = "info"
-    o.backgroundColor = C.COLORS.BACKGROUND
-    o.borderColor = C.COLORS.BORDER
-    o.title = getText("IGUI_DR_DailyRewards")
-    o.minimumWidth = C.MIN_W
-    o.minimumHeight = C.MIN_H
-    o.selectedDailyKey = nil
-    o.selectedStreakKey = nil
-    o.adminMode = "daily"
-    o.adminSelectedIndex = 1
-    o.adminDirty = false
-    o.adminConfig = nil
-    o.rewardItemsData = {}
-    o.rewardXpData = {}
-    o.rewardTraitsData = {}
-    o.selectedRewardItemIndex = 0
-    o.selectedRewardXpIndex = 0
+    o.playerObj                = playerObj or getPlayer()
+    o.snapshot                 = DailyRewards.ClientSnapshot or {}
+    o.activeTab                = "player"
+    o.statusMessage            = getText("IGUI_DR_StatusLoading")
+    o.statusLevel              = "info"
+    o.backgroundColor          = Theme.copy(Theme.colors.background)
+    o.borderColor              = Theme.copy(Theme.colors.border)
+    o.title                    = getText("IGUI_DR_DailyRewards")
+    o.minimumWidth             = C.SIZE.MIN_W
+    o.minimumHeight            = C.SIZE.MIN_H
+    o.selectedDailyKey         = nil
+    o.selectedStreakKey        = nil
+    o.adminMode                = "daily"
+    o.adminSelectedIndex       = 1
+    o.adminDirty               = false
+    o.adminConfig              = nil
+    o.rewardItemsData          = {}
+    o.rewardXpData             = {}
+    o.rewardTraitsData         = {}
+    o.selectedRewardItemIndex  = 0
+    o.selectedRewardXpIndex    = 0
     o.selectedRewardTraitIndex = 0
     return o
 end
@@ -752,23 +751,23 @@ function DailyRewardsPanel:createChildren()
     ISCollapsableWindow.createChildren(self)
     self:setResizable(true)
 
-    local y = C.TOP
-    local x = C.PAD
+    local y = C.LAYOUT.TOP
+    local x = C.LAYOUT.PAD
 
-    self.playerTabBtn = addButton(self, x, y, C.TAB_W, getText("IGUI_DR_PlayerView"), "TAB_PLAYER", "primary")
-    x = x + C.TAB_W + C.GAP
-    self.adminTabBtn = addButton(self, x, y, C.TAB_W, getText("IGUI_DR_AdminView"), "TAB_ADMIN")
-    x = x + C.TAB_W + C.GAP
-    self.refreshBtn = addButton(self, x, y, C.REFRESH_W, getText("IGUI_DR_Refresh"), "REFRESH")
+    self.playerTabBtn = addButton(self, x, y, C.CTRL.TAB_W, getText("IGUI_DR_PlayerView"), "TAB_PLAYER", "primary")
+    x = x + C.CTRL.TAB_W + C.LAYOUT.GAP
+    self.adminTabBtn = addButton(self, x, y, C.CTRL.TAB_W, getText("IGUI_DR_AdminView"), "TAB_ADMIN")
+    x = x + C.CTRL.TAB_W + C.LAYOUT.GAP
+    self.refreshBtn = addButton(self, x, y, C.CTRL.REFRESH_W, getText("IGUI_DR_Refresh"), "REFRESH")
 
-    y = y + C.BUTTON_H + C.GAP
+    y = y + C.CTRL.BUTTON_H + C.LAYOUT.GAP
 
     local leftW = 620
-    local dailyY = y + C.PLAYER_LIST_TITLE_GAP + C.SMALL_GAP
-    self.dailyGrid = ISScrollingListBox:new(C.PAD, dailyY, leftW, 330)
+    local dailyY = y + C.PLAYER.LIST_TITLE_GAP + C.LAYOUT.GAP_S
+    self.dailyGrid = ISScrollingListBox:new(C.LAYOUT.PAD, dailyY, leftW, 330)
     self.dailyGrid:initialise()
     self.dailyGrid:instantiate()
-    self.dailyGrid.itemheight = C.DAY_GRID_ROW
+    self.dailyGrid.itemheight = C.GRID.ROW
     self.dailyGrid.font = UIFont.Small
     self.dailyGrid.parentPanel = self
     self.dailyGrid.doDrawItem = DailyRewardsPanel.drawDailyGridRow
@@ -777,10 +776,10 @@ function DailyRewardsPanel:createChildren()
     applyListStyle(self.dailyGrid)
     self:addChild(self.dailyGrid)
 
-    self.streakList = ISScrollingListBox:new(C.PAD, self.dailyGrid:getBottom() + C.PLAYER_SECTION_GAP, leftW, 108)
+    self.streakList = ISScrollingListBox:new(C.LAYOUT.PAD, self.dailyGrid:getBottom() + C.PLAYER.SECTION_GAP, leftW, 108)
     self.streakList:initialise()
     self.streakList:instantiate()
-    self.streakList.itemheight = C.STREAK_ROW
+    self.streakList.itemheight = C.STREAK.ROW
     self.streakList.font = UIFont.Small
     self.streakList.parentPanel = self
     self.streakList.doDrawItem = DailyRewardsPanel.drawStreakItem
@@ -788,24 +787,25 @@ function DailyRewardsPanel:createChildren()
     applyListStyle(self.streakList)
     self:addChild(self.streakList)
 
-    local actionY = self.streakList:getBottom() + C.GAP
+    local actionY = self.streakList:getBottom() + C.LAYOUT.GAP
     self.claimDailyBtn =
-        addButton(self, C.PAD, actionY, C.CLAIM_DAILY_W, getText("IGUI_DR_ClaimDay"), "CLAIM_DAILY", "primary")
+        addButton(self, C.LAYOUT.PAD, actionY, C.CTRL.CLAIM_DAILY_W, getText("IGUI_DR_ClaimDay"), "CLAIM_DAILY",
+            "primary")
     self.claimStreakBtn =
         addButton(
             self,
-            self.claimDailyBtn:getRight() + C.GAP,
+            self.claimDailyBtn:getRight() + C.LAYOUT.GAP,
             actionY,
-            C.CLAIM_STREAK_W,
+            C.CTRL.CLAIM_STREAK_W,
             getText("IGUI_DR_ClaimStreak"),
             "CLAIM_STREAK",
             "primary"
         )
 
     self.detailRect = {
-        x = self.dailyGrid:getRight() + C.PLAYER_DETAIL_GAP,
+        x = self.dailyGrid:getRight() + C.PLAYER.DETAIL_GAP,
         y = self.dailyGrid:getY(),
-        width = self.width - self.dailyGrid:getRight() - C.PAD - C.PLAYER_DETAIL_GAP,
+        width = self.width - self.dailyGrid:getRight() - C.LAYOUT.PAD - C.PLAYER.DETAIL_GAP,
         height = self.streakList:getBottom() - self.dailyGrid:getY()
     }
 
@@ -824,13 +824,13 @@ function DailyRewardsPanel:createChildren()
 end
 
 function DailyRewardsPanel:createAdminChildren(contentY)
-    local settingsY = contentY + C.PLAYER_LIST_TITLE_GAP + 2
+    local settingsY = contentY + C.PLAYER.LIST_TITLE_GAP + 2
     self.settingsTickBox =
         ISTickBox:new(
-            C.PAD,
+            C.LAYOUT.PAD,
             settingsY,
-            C.SETTINGS_BOX_W,
-            C.SETTINGS_BOX_H,
+            C.SETTINGS.BOX_W,
+            C.SETTINGS.BOX_H,
             "DailyRewardsSettings",
             self,
             DailyRewardsPanel.onSettingChanged
@@ -843,31 +843,32 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     applyTickBoxStyle(self.settingsTickBox)
     self:addChild(self.settingsTickBox)
 
-    local fieldX = C.SETTINGS_FIELD_X
+    local fieldX = C.SETTINGS.FIELD_X
     local fieldY = settingsY
-    self.startDateEntry = addEntry(self, fieldX + C.SETTINGS_LABEL_W, fieldY, C.SETTINGS_DATE_W, C.FIELD_H)
+    self.startDateEntry = addEntry(self, fieldX + C.SETTINGS.LABEL_W, fieldY, C.SETTINGS.DATE_W, C.CTRL.FIELD_H)
     self.startDatePickBtn =
         addButton(
             self,
-            self.startDateEntry:getRight() + C.GAP,
+            self.startDateEntry:getRight() + C.LAYOUT.GAP,
             fieldY,
-            C.SETTINGS_PICK_W,
+            C.SETTINGS.PICK_W,
             getText("IGUI_DR_PickDate"),
             "PICK_START_DATE"
         )
-    local rightSettingsX = self.startDatePickBtn:getRight() + C.SETTINGS_LABEL_W + C.LARGE_GAP
+    local rightSettingsX = self.startDatePickBtn:getRight() + C.SETTINGS.LABEL_W + C.LAYOUT.GAP_L
     self.maxClaimableDaysEntry =
-        addEntry(self, fieldX + C.SETTINGS_LABEL_W, fieldY + C.SETTINGS_ROW_GAP, C.SETTINGS_VALUE_W, C.FIELD_H)
-    self.previewDaysEntry = addEntry(self, rightSettingsX, fieldY, C.SETTINGS_VALUE_W, C.FIELD_H)
-    self.resetStreakEntry = addEntry(self, rightSettingsX, fieldY + C.SETTINGS_ROW_GAP, C.SETTINGS_VALUE_W, C.FIELD_H)
+        addEntry(self, fieldX + C.SETTINGS.LABEL_W, fieldY + C.SETTINGS.ROW_GAP, C.SETTINGS.VALUE_W, C.CTRL.FIELD_H)
+    self.previewDaysEntry = addEntry(self, rightSettingsX, fieldY, C.SETTINGS.VALUE_W, C.CTRL.FIELD_H)
+    self.resetStreakEntry = addEntry(self, rightSettingsX, fieldY + C.SETTINGS.ROW_GAP, C.SETTINGS.VALUE_W,
+        C.CTRL.FIELD_H)
 
-    local bodyY = settingsY + C.SETTINGS_BOX_H + C.ADMIN_BODY_GAP
+    local bodyY = settingsY + C.SETTINGS.BOX_H + C.ADMIN.BODY_GAP
     self.adminDailyModeBtn =
-        addButton(self, C.PAD, bodyY, 115, getText("IGUI_DR_DailyDays"), "ADMIN_MODE_DAILY", "primary")
+        addButton(self, C.LAYOUT.PAD, bodyY, 115, getText("IGUI_DR_DailyDays"), "ADMIN_MODE_DAILY", "primary")
     self.adminStreakModeBtn =
         addButton(
             self,
-            self.adminDailyModeBtn:getRight() + C.GAP,
+            self.adminDailyModeBtn:getRight() + C.LAYOUT.GAP,
             bodyY,
             115,
             getText("IGUI_DR_AdminStreaks"),
@@ -875,10 +876,10 @@ function DailyRewardsPanel:createAdminChildren(contentY)
         )
 
     self.adminRewardsList =
-        ISScrollingListBox:new(C.PAD, bodyY + C.BUTTON_H + C.PLAYER_LIST_TITLE_GAP, C.ADMIN_LIST_W, 350)
+        ISScrollingListBox:new(C.LAYOUT.PAD, bodyY + C.CTRL.BUTTON_H + C.PLAYER.LIST_TITLE_GAP, C.ADMIN.LIST_W, 350)
     self.adminRewardsList:initialise()
     self.adminRewardsList:instantiate()
-    self.adminRewardsList.itemheight = C.ADMIN_REWARD_ROW
+    self.adminRewardsList.itemheight = C.ADMIN.REWARD_ROW
     self.adminRewardsList.font = UIFont.Small
     self.adminRewardsList.parentPanel = self
     self.adminRewardsList.doDrawItem = DailyRewardsPanel.drawAdminRewardItem
@@ -889,8 +890,8 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.addRewardBtn =
         addButton(
             self,
-            C.PAD,
-            self.adminRewardsList:getBottom() + C.GAP,
+            C.LAYOUT.PAD,
+            self.adminRewardsList:getBottom() + C.LAYOUT.GAP,
             85,
             getText("IGUI_DR_AddReward"),
             "ADMIN_ADD",
@@ -899,7 +900,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.deleteRewardBtn =
         addButton(
             self,
-            self.addRewardBtn:getRight() + C.GAP,
+            self.addRewardBtn:getRight() + C.LAYOUT.GAP,
             self.addRewardBtn:getY(),
             85,
             getText("IGUI_DR_DeleteReward"),
@@ -907,27 +908,27 @@ function DailyRewardsPanel:createAdminChildren(contentY)
             "danger"
         )
 
-    local editorX = self.adminRewardsList:getRight() + C.ADMIN_SECTION_GAP
+    local editorX = self.adminRewardsList:getRight() + C.ADMIN.SECTION_GAP
     local editorY = bodyY
     local editorW = 420
-    local editorRowY = editorY + C.BUTTON_H
-    self.rewardIdEntry = addEntry(self, editorX, editorRowY, 130, C.FIELD_H)
+    local editorRowY = editorY + C.CTRL.BUTTON_H
+    self.rewardIdEntry = addEntry(self, editorX, editorRowY, 130, C.CTRL.FIELD_H)
     self.rewardDayEntry =
-        addEntry(self, self.rewardIdEntry:getRight() + C.MEDIUM_GAP, editorRowY, C.SETTINGS_VALUE_W, C.FIELD_H)
+        addEntry(self, self.rewardIdEntry:getRight() + C.LAYOUT.GAP_M, editorRowY, C.SETTINGS.VALUE_W, C.CTRL.FIELD_H)
     self.rewardTitleEntry =
         addEntry(
             self,
-            self.rewardDayEntry:getRight() + C.MEDIUM_GAP,
+            self.rewardDayEntry:getRight() + C.LAYOUT.GAP_M,
             editorRowY,
-            editorW - (self.rewardDayEntry:getRight() - editorX) - C.MEDIUM_GAP,
-            C.FIELD_H
+            editorW - (self.rewardDayEntry:getRight() - editorX) - C.LAYOUT.GAP_M,
+            C.CTRL.FIELD_H
         )
     self.rewardRepeatTickBox =
         ISTickBox:new(
             self.rewardTitleEntry:getX(),
-            self.rewardTitleEntry:getBottom() + C.SMALL_GAP,
+            self.rewardTitleEntry:getBottom() + C.LAYOUT.GAP_S,
             170,
-            C.FIELD_H,
+            C.CTRL.FIELD_H,
             "DailyRewardsRepeat",
             self,
             DailyRewardsPanel.onSettingChanged
@@ -939,16 +940,16 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self:addChild(self.rewardRepeatTickBox)
 
     self.rewardDescriptionEntry =
-        addEntry(self, editorX, self.rewardRepeatTickBox:getBottom() + C.SMALL_GAP, editorW, 50, true, 4)
-    local itemRowY = self.rewardDescriptionEntry:getBottom() + C.ADMIN_SECTION_GAP + C.SMALL_GAP
-    self.rewardItemTypeEntry = addEntry(self, editorX, itemRowY, 220, C.FIELD_H)
+        addEntry(self, editorX, self.rewardRepeatTickBox:getBottom() + C.LAYOUT.GAP_S, editorW, 50, true, 4)
+    local itemRowY = self.rewardDescriptionEntry:getBottom() + C.ADMIN.SECTION_GAP + C.LAYOUT.GAP_S
+    self.rewardItemTypeEntry = addEntry(self, editorX, itemRowY, 220, C.CTRL.FIELD_H)
     self.rewardItemCountEntry =
-        addEntry(self, self.rewardItemTypeEntry:getRight() + C.MEDIUM_GAP, itemRowY, 50, C.FIELD_H)
+        addEntry(self, self.rewardItemTypeEntry:getRight() + C.LAYOUT.GAP_M, itemRowY, 50, C.CTRL.FIELD_H)
     self.rewardItemCountEntry:setOnlyNumbers(true)
     self.addRewardItemBtn =
         addButton(
             self,
-            self.rewardItemCountEntry:getRight() + C.MEDIUM_GAP,
+            self.rewardItemCountEntry:getRight() + C.LAYOUT.GAP_M,
             itemRowY,
             50,
             getText("IGUI_DR_Add"),
@@ -958,7 +959,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.removeRewardItemBtn =
         addButton(
             self,
-            self.addRewardItemBtn:getRight() + C.MEDIUM_GAP,
+            self.addRewardItemBtn:getRight() + C.LAYOUT.GAP_M,
             itemRowY,
             60,
             getText("IGUI_DR_Remove"),
@@ -969,7 +970,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
         addDataList(
             self,
             editorX,
-            self.rewardItemTypeEntry:getBottom() + C.SMALL_GAP,
+            self.rewardItemTypeEntry:getBottom() + C.LAYOUT.GAP_S,
             editorW,
             70,
             28,
@@ -978,14 +979,15 @@ function DailyRewardsPanel:createAdminChildren(contentY)
             "item"
         )
 
-    local xpRowY = self.rewardItemList:getBottom() + C.ADMIN_SECTION_GAP - C.SMALL_GAP
+    local xpRowY = self.rewardItemList:getBottom() + C.ADMIN.SECTION_GAP - C.LAYOUT.GAP_S
     self.rewardXpSkillCombo = addCombo(self, editorX, xpRowY, 220, DailyRewardsPanel.onRewardComboChanged)
-    self.rewardXpAmountEntry = addEntry(self, self.rewardXpSkillCombo:getRight() + C.MEDIUM_GAP, xpRowY, 50, C.FIELD_H)
+    self.rewardXpAmountEntry = addEntry(self, self.rewardXpSkillCombo:getRight() + C.LAYOUT.GAP_M, xpRowY, 50,
+        C.CTRL.FIELD_H)
     self.rewardXpAmountEntry:setOnlyNumbers(true)
     self.addRewardXpBtn =
         addButton(
             self,
-            self.rewardXpAmountEntry:getRight() + C.MEDIUM_GAP,
+            self.rewardXpAmountEntry:getRight() + C.LAYOUT.GAP_M,
             xpRowY,
             50,
             getText("IGUI_DR_Add"),
@@ -995,7 +997,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.removeRewardXpBtn =
         addButton(
             self,
-            self.addRewardXpBtn:getRight() + C.MEDIUM_GAP,
+            self.addRewardXpBtn:getRight() + C.LAYOUT.GAP_M,
             xpRowY,
             60,
             getText("IGUI_DR_Remove"),
@@ -1006,7 +1008,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
         addDataList(
             self,
             editorX,
-            self.rewardXpSkillCombo:getBottom() + C.SMALL_GAP,
+            self.rewardXpSkillCombo:getBottom() + C.LAYOUT.GAP_S,
             editorW,
             60,
             28,
@@ -1015,12 +1017,12 @@ function DailyRewardsPanel:createAdminChildren(contentY)
             "xp"
         )
 
-    local traitRowY = self.rewardXpList:getBottom() + C.ADMIN_SECTION_GAP - C.SMALL_GAP
+    local traitRowY = self.rewardXpList:getBottom() + C.ADMIN.SECTION_GAP - C.LAYOUT.GAP_S
     self.rewardTraitCombo = addCombo(self, editorX, traitRowY, 280, DailyRewardsPanel.onRewardComboChanged)
     self.addRewardTraitBtn =
         addButton(
             self,
-            self.rewardTraitCombo:getRight() + C.MEDIUM_GAP,
+            self.rewardTraitCombo:getRight() + C.LAYOUT.GAP_M,
             traitRowY,
             50,
             getText("IGUI_DR_Add"),
@@ -1030,7 +1032,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.removeRewardTraitBtn =
         addButton(
             self,
-            self.addRewardTraitBtn:getRight() + C.MEDIUM_GAP,
+            self.addRewardTraitBtn:getRight() + C.LAYOUT.GAP_M,
             traitRowY,
             60,
             getText("IGUI_DR_Remove"),
@@ -1041,7 +1043,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
         addDataList(
             self,
             editorX,
-            self.rewardTraitCombo:getBottom() + C.SMALL_GAP,
+            self.rewardTraitCombo:getBottom() + C.LAYOUT.GAP_S,
             editorW,
             60,
             28,
@@ -1051,14 +1053,14 @@ function DailyRewardsPanel:createAdminChildren(contentY)
         )
 
     self.rewardCustomEntry =
-        addEntry(self, editorX, self.rewardTraitList:getBottom() + C.ADMIN_SECTION_GAP, editorW, 70, true, 20)
+        addEntry(self, editorX, self.rewardTraitList:getBottom() + C.ADMIN.SECTION_GAP, editorW, 70, true, 20)
 
     self.applyRewardBtn =
         addButton(
             self,
             editorX,
-            self.rewardCustomEntry:getBottom() + C.ADMIN_SECTION_GAP - C.SMALL_GAP,
-            C.TAB_W,
+            self.rewardCustomEntry:getBottom() + C.ADMIN.SECTION_GAP - C.LAYOUT.GAP_S,
+            C.CTRL.TAB_W,
             getText("IGUI_DR_ApplyReward"),
             "ADMIN_APPLY",
             "primary"
@@ -1066,7 +1068,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.saveConfigBtn =
         addButton(
             self,
-            self.applyRewardBtn:getRight() + C.GAP,
+            self.applyRewardBtn:getRight() + C.LAYOUT.GAP,
             self.applyRewardBtn:getY(),
             120,
             getText("IGUI_DR_SaveAllConfig"),
@@ -1076,7 +1078,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.resetConfigBtn =
         addButton(
             self,
-            self.saveConfigBtn:getRight() + C.GAP,
+            self.saveConfigBtn:getRight() + C.LAYOUT.GAP,
             self.applyRewardBtn:getY(),
             120,
             getText("IGUI_DR_ResetConfig"),
@@ -1086,7 +1088,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.importConfigBtn =
         addButton(
             self,
-            self.resetConfigBtn:getRight() + C.GAP,
+            self.resetConfigBtn:getRight() + C.LAYOUT.GAP,
             self.applyRewardBtn:getY(),
             100,
             getText("IGUI_DR_ImportConfig"),
@@ -1095,7 +1097,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
     self.exportConfigBtn =
         addButton(
             self,
-            self.importConfigBtn:getRight() + C.GAP,
+            self.importConfigBtn:getRight() + C.LAYOUT.GAP,
             self.applyRewardBtn:getY(),
             100,
             getText("IGUI_DR_ExportConfig"),
@@ -1201,8 +1203,8 @@ function DailyRewardsPanel:layoutChildren(force)
         return
     end
 
-    local width = math.max(math.floor(self:getWidth()), self.minimumWidth or C.MIN_W)
-    local height = math.max(math.floor(self:getHeight()), self.minimumHeight or C.MIN_H)
+    local width = math.max(math.floor(self:getWidth()), self.minimumWidth or C.SIZE.MIN_W)
+    local height = math.max(math.floor(self:getHeight()), self.minimumHeight or C.SIZE.MIN_H)
     if self:getWidth() ~= width then
         self:setWidth(width)
     end
@@ -1219,26 +1221,26 @@ function DailyRewardsPanel:layoutChildren(force)
     setBounds(self.resizeWidget, width - rh, height - rh, rh, rh)
     setBounds(self.resizeWidget2, 0, height - rh, width - rh, rh)
 
-    local x = C.PAD
-    local y = C.TOP
-    setBounds(self.playerTabBtn, x, y, C.TAB_W, C.BUTTON_H)
-    x = x + C.TAB_W + C.GAP
-    setBounds(self.adminTabBtn, x, y, C.TAB_W, C.BUTTON_H)
-    x = x + C.TAB_W + C.GAP
-    setBounds(self.refreshBtn, x, y, C.REFRESH_W, C.BUTTON_H)
+    local x = C.LAYOUT.PAD
+    local y = C.LAYOUT.TOP
+    setBounds(self.playerTabBtn, x, y, C.CTRL.TAB_W, C.CTRL.BUTTON_H)
+    x = x + C.CTRL.TAB_W + C.LAYOUT.GAP
+    setBounds(self.adminTabBtn, x, y, C.CTRL.TAB_W, C.CTRL.BUTTON_H)
+    x = x + C.CTRL.TAB_W + C.LAYOUT.GAP
+    setBounds(self.refreshBtn, x, y, C.CTRL.REFRESH_W, C.CTRL.BUTTON_H)
 
-    local contentY = y + C.BUTTON_H + C.GAP
-    local statusTop = height - C.PAD - FONT_HGT_SMALL - C.STATUS_BAR_GAP
-    local playerGridY = contentY + C.PLAYER_LIST_TITLE_GAP + C.SMALL_GAP
+    local contentY = y + C.CTRL.BUTTON_H + C.LAYOUT.GAP
+    local statusTop = height - C.LAYOUT.PAD - FONT_HGT_SMALL - C.PLAYER.STATUS_BAR_GAP
+    local playerGridY = contentY + C.PLAYER.LIST_TITLE_GAP + C.LAYOUT.GAP_S
     local detailW = math.max(220, math.floor(width * 0.28))
-    local leftW = width - detailW - (C.PAD * 2) - C.PLAYER_DETAIL_GAP
+    local leftW = width - detailW - (C.LAYOUT.PAD * 2) - C.PLAYER.DETAIL_GAP
     if leftW < 500 then
         leftW = 500
-        detailW = width - leftW - (C.PAD * 2) - C.PLAYER_DETAIL_GAP
+        detailW = width - leftW - (C.LAYOUT.PAD * 2) - C.PLAYER.DETAIL_GAP
     end
     if detailW < 200 then
         detailW = 200
-        leftW = width - detailW - (C.PAD * 2) - C.PLAYER_DETAIL_GAP
+        leftW = width - detailW - (C.LAYOUT.PAD * 2) - C.PLAYER.DETAIL_GAP
     end
 
     local dailyContentW = leftW - getListScrollBarWidth(self.dailyGrid)
@@ -1249,21 +1251,22 @@ function DailyRewardsPanel:layoutChildren(force)
     self.dailyGrid.reserveScrollBarSpace = true
     local tileW = calculateDailyTileWidth(dailyContentW, columns)
     self.dailyGrid.itemheight = math.max(112, math.min(140, tileW + 24))
-    local actionY = statusTop - C.BUTTON_H
+    local actionY = statusTop - C.CTRL.BUTTON_H
     local streakH = math.max(104, math.min(132, math.floor(height * 0.16)))
-    local streakY = actionY - C.GAP - streakH
+    local streakY = actionY - C.LAYOUT.GAP - streakH
     local gridH =
-        math.max(self.dailyGrid.itemheight + C.PLAYER_LIST_TITLE_GAP, streakY - playerGridY - C.PLAYER_SECTION_GAP)
+        math.max(self.dailyGrid.itemheight + C.PLAYER.LIST_TITLE_GAP, streakY - playerGridY - C.PLAYER.SECTION_GAP)
 
-    setBounds(self.dailyGrid, C.PAD, playerGridY, leftW, gridH)
-    setBounds(self.streakList, C.PAD, self.dailyGrid:getBottom() + C.PLAYER_SECTION_GAP, leftW, streakH)
-    setBounds(self.claimDailyBtn, C.PAD, actionY, C.CLAIM_DAILY_W, C.BUTTON_H)
-    setBounds(self.claimStreakBtn, self.claimDailyBtn:getRight() + C.GAP, actionY, C.CLAIM_STREAK_W, C.BUTTON_H)
+    setBounds(self.dailyGrid, C.LAYOUT.PAD, playerGridY, leftW, gridH)
+    setBounds(self.streakList, C.LAYOUT.PAD, self.dailyGrid:getBottom() + C.PLAYER.SECTION_GAP, leftW, streakH)
+    setBounds(self.claimDailyBtn, C.LAYOUT.PAD, actionY, C.CTRL.CLAIM_DAILY_W, C.CTRL.BUTTON_H)
+    setBounds(self.claimStreakBtn, self.claimDailyBtn:getRight() + C.LAYOUT.GAP, actionY, C.CTRL.CLAIM_STREAK_W, C.CTRL
+        .BUTTON_H)
 
     self.detailRect = {
-        x = self.dailyGrid:getRight() + C.PLAYER_DETAIL_GAP,
+        x = self.dailyGrid:getRight() + C.PLAYER.DETAIL_GAP,
         y = self.dailyGrid:getY(),
-        width = width - self.dailyGrid:getRight() - C.PAD - C.PLAYER_DETAIL_GAP,
+        width = width - self.dailyGrid:getRight() - C.LAYOUT.PAD - C.PLAYER.DETAIL_GAP,
         height = self.streakList:getBottom() - self.dailyGrid:getY()
     }
 
@@ -1276,98 +1279,101 @@ function DailyRewardsPanel:layoutChildren(force)
     local compactEditor = height < 760 or narrowAdmin
     self._narrowAdminLayout = narrowAdmin
 
-    local settingsY = contentY + C.PLAYER_LIST_TITLE_GAP + 2
+    local settingsY = contentY + C.PLAYER.LIST_TITLE_GAP + 2
     setBounds(
         self.settingsTickBox,
-        C.PAD,
+        C.LAYOUT.PAD,
         settingsY,
-        narrowAdmin and C.SETTINGS_BOX_NARROW_W or C.SETTINGS_BOX_W,
-        C.SETTINGS_BOX_H
+        narrowAdmin and C.SETTINGS.BOX_NARROW_W or C.SETTINGS.BOX_W,
+        C.SETTINGS.BOX_H
     )
-    local fieldX = narrowAdmin and C.SETTINGS_FIELD_X_NARROW or C.SETTINGS_FIELD_X
-    local settingsLabelW = narrowAdmin and C.SETTINGS_LABEL_W_NARROW or C.SETTINGS_LABEL_W
-    local settingsRowGap = narrowAdmin and C.SETTINGS_ROW_GAP_NARROW or C.SETTINGS_ROW_GAP
+    local fieldX = narrowAdmin and C.SETTINGS.FIELD_X_NARROW or C.SETTINGS.FIELD_X
+    local settingsLabelW = narrowAdmin and C.SETTINGS.LABEL_W_NARROW or C.SETTINGS.LABEL_W
+    local settingsRowGap = narrowAdmin and C.SETTINGS.ROW_GAP_NARROW or C.SETTINGS.ROW_GAP
     local settingsEntryX = fieldX + settingsLabelW
     self._settingsLabelW = settingsLabelW
-    setBounds(self.startDateEntry, settingsEntryX, settingsY, C.SETTINGS_DATE_W, C.FIELD_H)
-    setBounds(self.startDatePickBtn, self.startDateEntry:getRight() + C.GAP, settingsY, C.SETTINGS_PICK_W, C.BUTTON_H)
-    setBounds(self.maxClaimableDaysEntry, settingsEntryX, settingsY + settingsRowGap, C.SETTINGS_VALUE_W, C.FIELD_H)
+    setBounds(self.startDateEntry, settingsEntryX, settingsY, C.SETTINGS.DATE_W, C.CTRL.FIELD_H)
+    setBounds(self.startDatePickBtn, self.startDateEntry:getRight() + C.LAYOUT.GAP, settingsY, C.SETTINGS.PICK_W,
+        C.CTRL.BUTTON_H)
+    setBounds(self.maxClaimableDaysEntry, settingsEntryX, settingsY + settingsRowGap, C.SETTINGS.VALUE_W, C.CTRL.FIELD_H)
     if narrowAdmin then
         setBounds(
             self.previewDaysEntry,
             settingsEntryX,
             settingsY + (settingsRowGap * 2),
-            C.SETTINGS_VALUE_W,
-            C.FIELD_H
+            C.SETTINGS.VALUE_W,
+            C.CTRL.FIELD_H
         )
         setBounds(
             self.resetStreakEntry,
             settingsEntryX,
             settingsY + (settingsRowGap * 3),
-            C.SETTINGS_VALUE_W,
-            C.FIELD_H
+            C.SETTINGS.VALUE_W,
+            C.CTRL.FIELD_H
         )
     else
-        local settingsRightX = self.startDatePickBtn:getRight() + settingsLabelW + C.LARGE_GAP
-        setBounds(self.previewDaysEntry, settingsRightX, settingsY, C.SETTINGS_VALUE_W, C.FIELD_H)
-        setBounds(self.resetStreakEntry, settingsRightX, settingsY + settingsRowGap, C.SETTINGS_VALUE_W, C.FIELD_H)
+        local settingsRightX = self.startDatePickBtn:getRight() + settingsLabelW + C.LAYOUT.GAP_L
+        setBounds(self.previewDaysEntry, settingsRightX, settingsY, C.SETTINGS.VALUE_W, C.CTRL.FIELD_H)
+        setBounds(self.resetStreakEntry, settingsRightX, settingsY + settingsRowGap, C.SETTINGS.VALUE_W, C.CTRL.FIELD_H)
     end
 
-    local bodyY = settingsY + C.SETTINGS_BOX_H + (narrowAdmin and C.ADMIN_BODY_GAP_NARROW or C.ADMIN_BODY_GAP)
+    local bodyY = settingsY + C.SETTINGS.BOX_H + (narrowAdmin and C.ADMIN.BODY_GAP_NARROW or C.ADMIN.BODY_GAP)
     local adminListW =
-        narrowAdmin and C.ADMIN_LIST_W_NARROW or (compactAdmin and C.ADMIN_LIST_W_COMPACT or C.ADMIN_LIST_W)
-    local adminGap = narrowAdmin and C.MEDIUM_GAP or (compactAdmin and C.LARGE_GAP or C.ADMIN_SECTION_GAP)
-    local modeBtnW = math.floor((adminListW - C.GAP) / 2)
-    setBounds(self.adminDailyModeBtn, C.PAD, bodyY, modeBtnW, C.BUTTON_H)
-    setBounds(self.adminStreakModeBtn, self.adminDailyModeBtn:getRight() + C.GAP, bodyY, modeBtnW, C.BUTTON_H)
+        narrowAdmin and C.ADMIN.LIST_W_NARROW or (compactAdmin and C.ADMIN.LIST_W_COMPACT or C.ADMIN.LIST_W)
+    local adminGap = narrowAdmin and C.LAYOUT.GAP_M or (compactAdmin and C.LAYOUT.GAP_L or C.ADMIN.SECTION_GAP)
+    local modeBtnW = math.floor((adminListW - C.LAYOUT.GAP) / 2)
+    setBounds(self.adminDailyModeBtn, C.LAYOUT.PAD, bodyY, modeBtnW, C.CTRL.BUTTON_H)
+    setBounds(self.adminStreakModeBtn, self.adminDailyModeBtn:getRight() + C.LAYOUT.GAP, bodyY, modeBtnW, C.CTRL
+        .BUTTON_H)
 
-    local editorX = C.PAD + adminListW + adminGap
-    local editorW = width - editorX - C.PAD
-    local minEditorW = narrowAdmin and C.ADMIN_EDITOR_MIN_W_NARROW or C.ADMIN_EDITOR_MIN_W
+    local editorX = C.LAYOUT.PAD + adminListW + adminGap
+    local editorW = width - editorX - C.LAYOUT.PAD
+    local minEditorW = narrowAdmin and C.ADMIN.EDITOR_MIN_W_NARROW or C.ADMIN.EDITOR_MIN_W
     if editorW < minEditorW then
         editorW = minEditorW
     end
-    local listTop = bodyY + C.BUTTON_H + C.PLAYER_LIST_TITLE_GAP + C.SMALL_GAP
-    local buttonY = statusTop - C.BUTTON_H
-    local listH = math.max(120, buttonY - listTop - C.GAP)
-    self._adminSectionLabelY = listTop - FONT_HGT_SMALL - C.ADMIN_SECTION_TITLE_GAP
+    local listTop = bodyY + C.CTRL.BUTTON_H + C.PLAYER.LIST_TITLE_GAP + C.LAYOUT.GAP_S
+    local buttonY = statusTop - C.CTRL.BUTTON_H
+    local listH = math.max(120, buttonY - listTop - C.LAYOUT.GAP)
+    self._adminSectionLabelY = listTop - FONT_HGT_SMALL - C.ADMIN.SECTION_TITLE_GAP
 
-    setBounds(self.adminRewardsList, C.PAD, listTop, adminListW, listH)
-    local listButtonW = math.floor((adminListW - C.GAP) / 2)
-    setBounds(self.addRewardBtn, C.PAD, buttonY, listButtonW, C.BUTTON_H)
-    setBounds(self.deleteRewardBtn, self.addRewardBtn:getRight() + C.GAP, buttonY, listButtonW, C.BUTTON_H)
+    setBounds(self.adminRewardsList, C.LAYOUT.PAD, listTop, adminListW, listH)
+    local listButtonW = math.floor((adminListW - C.LAYOUT.GAP) / 2)
+    setBounds(self.addRewardBtn, C.LAYOUT.PAD, buttonY, listButtonW, C.CTRL.BUTTON_H)
+    setBounds(self.deleteRewardBtn, self.addRewardBtn:getRight() + C.LAYOUT.GAP, buttonY, listButtonW, C.CTRL.BUTTON_H)
 
-    local topLabelSpace = FONT_HGT_SMALL + C.ADMIN_SECTION_TITLE_GAP
+    local topLabelSpace = FONT_HGT_SMALL + C.ADMIN.SECTION_TITLE_GAP
     local editorY = listTop + topLabelSpace
     local idW = narrowAdmin and 80 or (compactAdmin and 100 or 130)
     local dayW = narrowAdmin and 55 or (compactAdmin and 60 or 70)
-    local dayX = editorX + idW + C.MEDIUM_GAP + C.ICON_TEXTURE_PAD
-    local titleX = dayX + dayW + C.MEDIUM_GAP + C.ICON_TEXTURE_PAD
+    local dayX = editorX + idW + C.LAYOUT.GAP_M + C.ICON.TEXTURE_PAD
+    local titleX = dayX + dayW + C.LAYOUT.GAP_M + C.ICON.TEXTURE_PAD
     local repeatW = self.adminMode == "streak" and (narrowAdmin and 100 or 115) or 0
-    local titleW = editorX + editorW - titleX - (repeatW > 0 and (repeatW + C.GAP) or 0)
-    setBounds(self.rewardIdEntry, editorX, editorY, idW, C.FIELD_H)
-    setBounds(self.rewardDayEntry, dayX, editorY, dayW, C.FIELD_H)
-    setBounds(self.rewardTitleEntry, titleX, editorY, math.max(110, titleW), C.FIELD_H)
+    local titleW = editorX + editorW - titleX - (repeatW > 0 and (repeatW + C.LAYOUT.GAP) or 0)
+    setBounds(self.rewardIdEntry, editorX, editorY, idW, C.CTRL.FIELD_H)
+    setBounds(self.rewardDayEntry, dayX, editorY, dayW, C.CTRL.FIELD_H)
+    setBounds(self.rewardTitleEntry, titleX, editorY, math.max(110, titleW), C.CTRL.FIELD_H)
 
-    local editorGap = compactEditor and C.SMALL_GAP or C.MEDIUM_GAP
-    local cursorY = editorY + C.FIELD_H + editorGap
+    local editorGap = compactEditor and C.LAYOUT.GAP_S or C.LAYOUT.GAP_M
+    local cursorY = editorY + C.CTRL.FIELD_H + editorGap
     if self.adminMode == "streak" then
-        setBounds(self.rewardRepeatTickBox, self.rewardTitleEntry:getRight() + C.GAP, editorY, repeatW, C.FIELD_H)
+        setBounds(self.rewardRepeatTickBox, self.rewardTitleEntry:getRight() + C.LAYOUT.GAP, editorY, repeatW,
+            C.CTRL.FIELD_H)
     else
-        setBounds(self.rewardRepeatTickBox, editorX, cursorY, math.min(115, editorW), C.FIELD_H)
+        setBounds(self.rewardRepeatTickBox, editorX, cursorY, math.min(115, editorW), C.CTRL.FIELD_H)
     end
 
     local descriptionH = compactEditor and 40 or 50
     local descriptionY = cursorY + topLabelSpace
     setBounds(self.rewardDescriptionEntry, editorX, descriptionY, editorW, descriptionH)
 
-    local sectionGap = compactEditor and C.GAP or C.MEDIUM_GAP
-    local sectionTitleH = FONT_HGT_MEDIUM + C.LIST_ICON_TEXT_GAP
-    local fieldLabelH = FONT_HGT_SMALL + C.LABEL_OFFSET_Y
-    local controlGap = compactEditor and C.SMALL_GAP or 6
-    local listGap = C.LIST_ICON_TEXT_GAP
+    local sectionGap = compactEditor and C.LAYOUT.GAP or C.LAYOUT.GAP_M
+    local sectionTitleH = FONT_HGT_MEDIUM + C.LIST.ICON_TEXT_GAP
+    local fieldLabelH = FONT_HGT_SMALL + C.LABEL.OFFSET_Y
+    local controlGap = compactEditor and C.LAYOUT.GAP_S or 6
+    local listGap = C.LIST.ICON_TEXT_GAP
     local rewardSectionsY = self.rewardDescriptionEntry:getBottom() + sectionGap
-    local sectionGapX = C.ADMIN_SECTION_GAP - 2
+    local sectionGapX = C.ADMIN.SECTION_GAP - 2
     local sectionW = math.floor((editorW - sectionGapX) / 2)
     local topListMinH = compactEditor and 45 or 55
     local traitListMinH = compactEditor and 35 or 45
@@ -1375,10 +1381,10 @@ function DailyRewardsPanel:layoutChildren(force)
     local topListFloorH = compactEditor and 30 or 40
     local traitListFloorH = compactEditor and 25 or 35
     local customFloorH = compactEditor and 40 or 50
-    local sharedListChromeH = sectionTitleH + fieldLabelH + C.FIELD_H + listGap
+    local sharedListChromeH = sectionTitleH + fieldLabelH + C.CTRL.FIELD_H + listGap
     local topSectionMinH = sharedListChromeH + topListMinH
     local bottomSectionMinH = math.max(sharedListChromeH + traitListMinH, sectionTitleH + customMinH)
-    local availableSectionH = math.max(sectionGap + 2, buttonY - rewardSectionsY - C.GAP)
+    local availableSectionH = math.max(sectionGap + 2, buttonY - rewardSectionsY - C.LAYOUT.GAP)
     local requiredSectionH = topSectionMinH + bottomSectionMinH + sectionGap
     local topSectionH
     local bottomSectionH
@@ -1421,12 +1427,14 @@ function DailyRewardsPanel:layoutChildren(force)
 
     local itemLabelY = rewardSectionsY + sectionTitleH
     local itemRowY = itemLabelY + fieldLabelH
-    local itemListY = itemRowY + C.FIELD_H + listGap
+    local itemListY = itemRowY + C.CTRL.FIELD_H + listGap
     local itemTypeW = math.max(90, sectionW - countW - addW - removeW - (controlGap * 3))
-    setBounds(self.rewardItemTypeEntry, leftSectionX, itemRowY, itemTypeW, C.FIELD_H)
-    setBounds(self.rewardItemCountEntry, self.rewardItemTypeEntry:getRight() + controlGap, itemRowY, countW, C.FIELD_H)
-    setBounds(self.addRewardItemBtn, self.rewardItemCountEntry:getRight() + controlGap, itemRowY, addW, C.BUTTON_H)
-    setBounds(self.removeRewardItemBtn, self.addRewardItemBtn:getRight() + controlGap, itemRowY, removeW, C.BUTTON_H)
+    setBounds(self.rewardItemTypeEntry, leftSectionX, itemRowY, itemTypeW, C.CTRL.FIELD_H)
+    setBounds(self.rewardItemCountEntry, self.rewardItemTypeEntry:getRight() + controlGap, itemRowY, countW,
+        C.CTRL.FIELD_H)
+    setBounds(self.addRewardItemBtn, self.rewardItemCountEntry:getRight() + controlGap, itemRowY, addW, C.CTRL.BUTTON_H)
+    setBounds(self.removeRewardItemBtn, self.addRewardItemBtn:getRight() + controlGap, itemRowY, removeW, C.CTRL
+        .BUTTON_H)
     setBounds(
         self.rewardItemList,
         leftSectionX,
@@ -1437,12 +1445,12 @@ function DailyRewardsPanel:layoutChildren(force)
 
     local xpLabelY = rewardSectionsY + sectionTitleH
     local xpRowY = xpLabelY + fieldLabelH
-    local xpListY = xpRowY + C.FIELD_H + listGap
+    local xpListY = xpRowY + C.CTRL.FIELD_H + listGap
     local skillW = math.max(90, sectionW - amountW - addW - removeW - (controlGap * 3))
-    setBounds(self.rewardXpSkillCombo, rightSectionX, xpRowY, skillW, C.FIELD_H)
-    setBounds(self.rewardXpAmountEntry, self.rewardXpSkillCombo:getRight() + controlGap, xpRowY, amountW, C.FIELD_H)
-    setBounds(self.addRewardXpBtn, self.rewardXpAmountEntry:getRight() + controlGap, xpRowY, addW, C.BUTTON_H)
-    setBounds(self.removeRewardXpBtn, self.addRewardXpBtn:getRight() + controlGap, xpRowY, removeW, C.BUTTON_H)
+    setBounds(self.rewardXpSkillCombo, rightSectionX, xpRowY, skillW, C.CTRL.FIELD_H)
+    setBounds(self.rewardXpAmountEntry, self.rewardXpSkillCombo:getRight() + controlGap, xpRowY, amountW, C.CTRL.FIELD_H)
+    setBounds(self.addRewardXpBtn, self.rewardXpAmountEntry:getRight() + controlGap, xpRowY, addW, C.CTRL.BUTTON_H)
+    setBounds(self.removeRewardXpBtn, self.addRewardXpBtn:getRight() + controlGap, xpRowY, removeW, C.CTRL.BUTTON_H)
     setBounds(
         self.rewardXpList,
         rightSectionX,
@@ -1453,11 +1461,12 @@ function DailyRewardsPanel:layoutChildren(force)
 
     local traitLabelY = bottomSectionY + sectionTitleH
     local traitRowY = traitLabelY + fieldLabelH
-    local traitListY = traitRowY + C.FIELD_H + listGap
+    local traitListY = traitRowY + C.CTRL.FIELD_H + listGap
     local traitComboW = math.max(120, sectionW - addW - removeW - (controlGap * 2))
-    setBounds(self.rewardTraitCombo, leftSectionX, traitRowY, traitComboW, C.FIELD_H)
-    setBounds(self.addRewardTraitBtn, self.rewardTraitCombo:getRight() + controlGap, traitRowY, addW, C.BUTTON_H)
-    setBounds(self.removeRewardTraitBtn, self.addRewardTraitBtn:getRight() + controlGap, traitRowY, removeW, C.BUTTON_H)
+    setBounds(self.rewardTraitCombo, leftSectionX, traitRowY, traitComboW, C.CTRL.FIELD_H)
+    setBounds(self.addRewardTraitBtn, self.rewardTraitCombo:getRight() + controlGap, traitRowY, addW, C.CTRL.BUTTON_H)
+    setBounds(self.removeRewardTraitBtn, self.addRewardTraitBtn:getRight() + controlGap, traitRowY, removeW,
+        C.CTRL.BUTTON_H)
     setBounds(
         self.rewardTraitList,
         leftSectionX,
@@ -1475,12 +1484,14 @@ function DailyRewardsPanel:layoutChildren(force)
         math.max(customFloorH, bottomSectionH - sectionTitleH)
     )
 
-    local editorButtonW = math.floor((editorW - (C.GAP * 4)) / 5)
-    setBounds(self.applyRewardBtn, editorX, buttonY, editorButtonW, C.BUTTON_H)
-    setBounds(self.saveConfigBtn, self.applyRewardBtn:getRight() + C.GAP, buttonY, editorButtonW, C.BUTTON_H)
-    setBounds(self.resetConfigBtn, self.saveConfigBtn:getRight() + C.GAP, buttonY, editorButtonW, C.BUTTON_H)
-    setBounds(self.importConfigBtn, self.resetConfigBtn:getRight() + C.GAP, buttonY, editorButtonW, C.BUTTON_H)
-    setBounds(self.exportConfigBtn, self.importConfigBtn:getRight() + C.GAP, buttonY, editorButtonW, C.BUTTON_H)
+    local editorButtonW = math.floor((editorW - (C.LAYOUT.GAP * 4)) / 5)
+    setBounds(self.applyRewardBtn, editorX, buttonY, editorButtonW, C.CTRL.BUTTON_H)
+    setBounds(self.saveConfigBtn, self.applyRewardBtn:getRight() + C.LAYOUT.GAP, buttonY, editorButtonW, C.CTRL.BUTTON_H)
+    setBounds(self.resetConfigBtn, self.saveConfigBtn:getRight() + C.LAYOUT.GAP, buttonY, editorButtonW, C.CTRL.BUTTON_H)
+    setBounds(self.importConfigBtn, self.resetConfigBtn:getRight() + C.LAYOUT.GAP, buttonY, editorButtonW,
+        C.CTRL.BUTTON_H)
+    setBounds(self.exportConfigBtn, self.importConfigBtn:getRight() + C.LAYOUT.GAP, buttonY, editorButtonW,
+        C.CTRL.BUTTON_H)
 end
 
 function DailyRewardsPanel:isAdmin()
@@ -1539,7 +1550,7 @@ function DailyRewardsPanel:populateDailyGrid()
 
     local selectedGridRow = 1
     local groupIndex = 1
-    local columns = self.dailyGridColumns or C.DAY_GRID_COLUMNS
+    local columns = self.dailyGridColumns or C.GRID.COLUMNS
     self.dailyGrid.dailyRewardColumns = columns
     for i = 1, #rows, columns do
         local group = { rows = {} }
@@ -1753,7 +1764,7 @@ function DailyRewardsPanel:refreshRewardTraitList()
             math.max(
                 1,
                 math.min(self.selectedRewardTraitIndex > 0 and self.selectedRewardTraitIndex or 1, #self
-                .rewardTraitsData)
+                    .rewardTraitsData)
             )
     end
     self.rewardTraitList.selected = self.selectedRewardTraitIndex
@@ -2294,14 +2305,14 @@ function DailyRewardsPanel.drawRewardItemListItem(list, y, item, alt)
     local row = item.item or {}
     local selected = list.selected == item.index
     local background = selected and C.COLORS.SELECTED or (alt and C.COLORS.ALT or C.COLORS.FIELD)
-    local iconSize = math.min(C.LIST_ICON_SIZE, list.itemheight - C.LIST_ICON_TEXT_GAP)
+    local iconSize = math.min(C.LIST.ICON_SIZE, list.itemheight - C.LIST.ICON_TEXT_GAP)
     local iconY = y + math.floor((list.itemheight - iconSize) / 2)
     local textY = y + math.floor((list.itemheight - FONT_HGT_SMALL) / 2)
-    local textX = C.LIST_ICON_INSET + iconSize + C.LIST_ICON_TEXT_GAP
-    local contentRight = getListContentRight(list, C.LIST_ICON_INSET)
+    local textX = C.LIST.ICON_INSET + iconSize + C.LIST.ICON_TEXT_GAP
+    local contentRight = getListContentRight(list, C.LIST.ICON_INSET)
     local summaryText = "x" .. tostring(row.count or 1)
     local summaryWidth = measure(UIFont.Small, summaryText)
-    local labelWidth = math.max(20, contentRight - textX - summaryWidth - C.LIST_TEXT_RIGHT_PAD)
+    local labelWidth = math.max(20, contentRight - textX - summaryWidth - C.LIST.TEXT_RIGHT_PAD)
 
     drawClippedListRow(
         list,
@@ -2325,7 +2336,7 @@ function DailyRewardsPanel.drawRewardItemListItem(list, y, item, alt)
                     texture = getItemTexture(row.type),
                     fallback = "IT"
                 },
-                C.LIST_ICON_PAD,
+                C.LIST.ICON_PAD,
                 iconY,
                 iconSize
             )
@@ -2358,14 +2369,14 @@ function DailyRewardsPanel.drawRewardXpListItem(list, y, item, alt)
     local row = item.item or {}
     local selected = list.selected == item.index
     local background = selected and C.COLORS.SELECTED or (alt and C.COLORS.ALT or C.COLORS.FIELD)
-    local iconSize = math.min(C.LIST_ICON_SIZE, list.itemheight - C.LIST_ICON_TEXT_GAP)
+    local iconSize = math.min(C.LIST.ICON_SIZE, list.itemheight - C.LIST.ICON_TEXT_GAP)
     local iconY = y + math.floor((list.itemheight - iconSize) / 2)
     local textY = y + math.floor((list.itemheight - FONT_HGT_SMALL) / 2)
-    local textX = C.LIST_ICON_INSET + iconSize + C.LIST_ICON_TEXT_GAP
-    local contentRight = getListContentRight(list, C.LIST_ICON_INSET)
+    local textX = C.LIST.ICON_INSET + iconSize + C.LIST.ICON_TEXT_GAP
+    local contentRight = getListContentRight(list, C.LIST.ICON_INSET)
     local summaryText = "+" .. tostring(row.amount or 0) .. " XP"
     local summaryWidth = measure(UIFont.Small, summaryText)
-    local labelWidth = math.max(20, contentRight - textX - summaryWidth - C.LIST_TEXT_RIGHT_PAD)
+    local labelWidth = math.max(20, contentRight - textX - summaryWidth - C.LIST.TEXT_RIGHT_PAD)
 
     drawClippedListRow(
         list,
@@ -2389,7 +2400,7 @@ function DailyRewardsPanel.drawRewardXpListItem(list, y, item, alt)
                     texture = getSkillTexture(row.perk),
                     fallback = getSkillLabel(row.perk or "")
                 },
-                C.LIST_ICON_PAD,
+                C.LIST.ICON_PAD,
                 iconY,
                 iconSize
             )
@@ -2423,11 +2434,11 @@ function DailyRewardsPanel.drawRewardTraitListItem(list, y, item, alt)
     local traitInfo = Shared.GetTraitInfo(row.type)
     local selected = list.selected == item.index
     local background = selected and C.COLORS.SELECTED or (alt and C.COLORS.ALT or C.COLORS.FIELD)
-    local iconSize = math.min(C.LIST_ICON_SIZE, list.itemheight - C.LIST_ICON_TEXT_GAP)
+    local iconSize = math.min(C.LIST.ICON_SIZE, list.itemheight - C.LIST.ICON_TEXT_GAP)
     local iconY = y + math.floor((list.itemheight - iconSize) / 2)
     local textY = y + math.floor((list.itemheight - FONT_HGT_SMALL) / 2)
-    local textX = C.LIST_ICON_INSET + iconSize + C.LIST_ICON_TEXT_GAP
-    local contentRight = getListContentRight(list, C.LIST_ICON_INSET)
+    local textX = C.LIST.ICON_INSET + iconSize + C.LIST.ICON_TEXT_GAP
+    local contentRight = getListContentRight(list, C.LIST.ICON_INSET)
     local textColor = traitInfo and traitInfo.positive and C.COLORS.READY or C.COLORS.LOCKED
 
     drawClippedListRow(
@@ -2453,7 +2464,7 @@ function DailyRewardsPanel.drawRewardTraitListItem(list, y, item, alt)
                     texture = getTraitTexture(row.type),
                     fallback = getTraitShortLabel(row.type)
                 },
-                C.LIST_ICON_PAD,
+                C.LIST.ICON_PAD,
                 iconY,
                 iconSize
             )
@@ -2510,24 +2521,28 @@ function DailyRewardsPanel.onRewardComboChanged(target, combo)
 end
 
 drawRewardIconTile = function(list, icon, x, y, size)
-    local fill =
-        icon.type == "xp" and { r = 0.16, g = 0.24, b = 0.34, a = 0.9 } or { r = 0.08, g = 0.08, b = 0.08, a = 0.88 }
-    if icon.type == "custom" then
-        fill = { r = 0.24, g = 0.20, b = 0.12, a = 0.9 }
+    local T = Theme.colors
+    local fill
+    if icon.type == "xp" then
+        fill = T.iconXp
     elseif icon.type == "trait" then
-        fill = icon.positive and { r = 0.12, g = 0.22, b = 0.14, a = 0.9 } or { r = 0.24, g = 0.12, b = 0.12, a = 0.9 }
+        fill = icon.positive and T.iconTrait or T.iconTraitNeg
+    elseif icon.type == "custom" then
+        fill = T.iconCustom
+    else
+        fill = T.iconItem
     end
 
     list:drawRect(x, y, size, size, fill.a, fill.r, fill.g, fill.b)
-    list:drawRectBorder(x, y, size, size, 0.75, C.COLORS.BORDER.r, C.COLORS.BORDER.g, C.COLORS.BORDER.b)
+    list:drawRectBorder(x, y, size, size, 0.75, T.border.r, T.border.g, T.border.b)
 
     if icon.texture then
         list:drawTextureScaledAspect(
             icon.texture,
-            x + C.ICON_TEXTURE_PAD,
-            y + C.ICON_TEXTURE_PAD,
-            size - (C.ICON_TEXTURE_PAD * 2),
-            size - (C.ICON_TEXTURE_PAD * 2),
+            x + C.ICON.TEXTURE_PAD,
+            y + C.ICON.TEXTURE_PAD,
+            size - (C.ICON.TEXTURE_PAD * 2),
+            size - (C.ICON.TEXTURE_PAD * 2),
             1,
             1,
             1,
@@ -2537,7 +2552,7 @@ drawRewardIconTile = function(list, icon, x, y, size)
         local label = icon.fallback or icon.label
         if label and label ~= "" then
             list:drawTextCentre(
-                trimTextToWidth(UIFont.Small, tostring(label), size - (C.ICON_LABEL_PAD * 2)),
+                trimTextToWidth(UIFont.Small, tostring(label), size - (C.ICON.LABEL_PAD * 2)),
                 x + (size / 2),
                 y + math.floor((size - FONT_HGT_SMALL) / 2),
                 1,
@@ -2562,21 +2577,19 @@ drawRewardIconTile = function(list, icon, x, y, size)
 
     if icon.label and icon.label ~= "" and icon.texture then
         local label = tostring(icon.label)
-        local labelW = math.min(size - C.ICON_TEXTURE_PAD, measure(UIFont.Small, label) + C.ICON_LABEL_PAD)
+        local labelW = math.min(size - C.ICON.TEXTURE_PAD, measure(UIFont.Small, label) + C.ICON.LABEL_PAD)
+        local ov = Theme.colors.badgeOverlay
         list:drawRect(
             x + size - labelW,
-            y + size - FONT_HGT_SMALL - C.ICON_LABEL_PAD,
+            y + size - FONT_HGT_SMALL - C.ICON.LABEL_PAD,
             labelW,
-            FONT_HGT_SMALL + C.ICON_LABEL_PAD,
-            0.72,
-            0,
-            0,
-            0
+            FONT_HGT_SMALL + C.ICON.LABEL_PAD,
+            ov.a, ov.r, ov.g, ov.b
         )
         list:drawTextRight(
             label,
-            x + size - C.ICON_TEXTURE_PAD,
-            y + size - FONT_HGT_SMALL - C.ICON_LABEL_TEXT_PAD,
+            x + size - C.ICON.TEXTURE_PAD,
+            y + size - FONT_HGT_SMALL - C.ICON.LABEL_TEXT_PAD,
             1,
             1,
             1,
@@ -2588,8 +2601,8 @@ end
 
 local function getDailyTileMetrics(list)
     local columns =
-        list.dailyRewardColumns or (list.parentPanel and list.parentPanel.dailyGridColumns) or C.DAY_GRID_COLUMNS
-    local gap = C.DAY_TILE_GAP
+        list.dailyRewardColumns or (list.parentPanel and list.parentPanel.dailyGridColumns) or C.GRID.COLUMNS
+    local gap = C.GRID.TILE_GAP
     local contentW = getListContentWidth(list, list.reserveScrollBarSpace == true)
     local tileW = calculateDailyTileWidth(contentW, columns)
     local tileH = list.itemheight - (gap * 2)
@@ -2626,19 +2639,20 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
     local tileY = y + gap
 
     for i = 1, #group.rows do
-        local row = group.rows[i]
-        local x = gap + ((i - 1) * (tileW + gap))
+        local row                     = group.rows[i]
+        local x                       = gap + ((i - 1) * (tileW + gap))
         local statusText, statusColor = getDailyStatus(row)
-        local selected = row.dateKey == panel.selectedDailyKey
-        local fill = C.COLORS.FIELD_DARK
+        local selected                = row.dateKey == panel.selectedDailyKey
+        local T                       = Theme.colors
+        local fill
         if row.claimed then
-            fill = { r = 0.12, g = 0.22, b = 0.27, a = 0.9 }
+            fill = T.tileClaimed
         elseif row.claimable then
-            fill = { r = 0.12, g = 0.22, b = 0.14, a = 0.9 }
+            fill = T.tileReady
         elseif row.future then
-            fill = { r = 0.12, g = 0.12, b = 0.12, a = 0.9 }
+            fill = T.tileFuture
         else
-            fill = { r = 0.22, g = 0.16, b = 0.08, a = 0.9 }
+            fill = T.tileLocked
         end
 
         list:drawRect(x, tileY, tileW, tileH, fill.a, fill.r, fill.g, fill.b)
@@ -2666,9 +2680,9 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
         )
 
         list:drawText(
-            trimTextToWidth(UIFont.Small, "Day " .. tostring(row.dayNumber or "?"), tileW - C.TILE_TEXT_WIDTH_PAD),
-            x + C.TILE_TEXT_PAD,
-            tileY + C.TILE_TOP_PAD,
+            trimTextToWidth(UIFont.Small, "Day " .. tostring(row.dayNumber or "?"), tileW - C.TILE.TEXT_WIDTH_PAD),
+            x + C.TILE.TEXT_PAD,
+            tileY + C.TILE.TOP_PAD,
             C.COLORS.TEXT.r,
             C.COLORS.TEXT.g,
             C.COLORS.TEXT.b,
@@ -2677,9 +2691,9 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
         )
         local title = row.reward and row.reward.title or ""
         list:drawText(
-            trimTextToWidth(UIFont.Small, title, tileW - C.TILE_TEXT_WIDTH_PAD),
-            x + C.TILE_TEXT_PAD,
-            tileY + C.TILE_TITLE_Y,
+            trimTextToWidth(UIFont.Small, title, tileW - C.TILE.TEXT_WIDTH_PAD),
+            x + C.TILE.TEXT_PAD,
+            tileY + C.TILE.TITLE_Y,
             C.COLORS.TEXT.r,
             C.COLORS.TEXT.g,
             C.COLORS.TEXT.b,
@@ -2688,13 +2702,13 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
         )
         local iconSize = math.max(22, math.min(30, math.floor((tileW - 22) / 3)))
         local maxIcons =
-            math.max(2, math.min(4, math.floor((tileW - C.TILE_TEXT_WIDTH_PAD) / (iconSize + C.TILE_ICON_GAP))))
+            math.max(2, math.min(4, math.floor((tileW - C.TILE.TEXT_WIDTH_PAD) / (iconSize + C.TILE.ICON_GAP))))
         local icons, remaining = getRewardPreviewIcons(row.reward and row.reward.rewards or nil, maxIcons)
-        local iconY = tileY + C.TILE_ICON_Y
-        local iconX = x + C.TILE_TEXT_PAD
+        local iconY = tileY + C.TILE.ICON_Y
+        local iconX = x + C.TILE.TEXT_PAD
         for iconIndex = 1, #icons do
             drawRewardIconTile(list, icons[iconIndex], iconX, iconY, iconSize)
-            iconX = iconX + iconSize + C.TILE_ICON_GAP
+            iconX = iconX + iconSize + C.TILE.ICON_GAP
         end
         if remaining and remaining > 0 then
             list:drawText(
@@ -2709,13 +2723,13 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
             )
         end
         local shortDate = formatDateKey(row.dateKey, "DMY")
-        local footerW = tileW - C.TILE_TEXT_WIDTH_PAD
+        local footerW = tileW - C.TILE.TEXT_WIDTH_PAD
         if measure(UIFont.Small, shortDate) + measure(UIFont.Small, statusText) + 22 > footerW then
-            local dateY = tileY + tileH - (FONT_HGT_SMALL * 2) - C.TILE_FOOTER_STACK_GAP
+            local dateY = tileY + tileH - (FONT_HGT_SMALL * 2) - C.TILE.FOOTER_STACK_GAP
             local statusY = dateY + FONT_HGT_SMALL + 1
             list:drawText(
                 trimTextToWidth(UIFont.Small, shortDate, footerW),
-                x + C.TILE_TEXT_PAD,
+                x + C.TILE.TEXT_PAD,
                 dateY,
                 C.COLORS.MUTED.r,
                 C.COLORS.MUTED.g,
@@ -2725,7 +2739,7 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
             )
             list:drawText(
                 trimTextToWidth(UIFont.Small, statusText, footerW),
-                x + C.TILE_TEXT_PAD,
+                x + C.TILE.TEXT_PAD,
                 statusY,
                 statusColor.r,
                 statusColor.g,
@@ -2734,10 +2748,10 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
                 UIFont.Small
             )
         else
-            local footerY = tileY + tileH - FONT_HGT_SMALL - C.TILE_FOOTER_PAD
+            local footerY = tileY + tileH - FONT_HGT_SMALL - C.TILE.FOOTER_PAD
             list:drawText(
                 trimTextToWidth(UIFont.Small, shortDate, math.floor(footerW * 0.58)),
-                x + C.TILE_TEXT_PAD,
+                x + C.TILE.TEXT_PAD,
                 footerY,
                 C.COLORS.MUTED.r,
                 C.COLORS.MUTED.g,
@@ -2747,7 +2761,7 @@ function DailyRewardsPanel.drawDailyGridRow(list, y, item, alt)
             )
             list:drawTextRight(
                 trimTextToWidth(UIFont.Small, statusText, math.floor(footerW * 0.40)),
-                x + tileW - C.TILE_TEXT_PAD,
+                x + tileW - C.TILE.TEXT_PAD,
                 footerY,
                 statusColor.r,
                 statusColor.g,
@@ -2802,8 +2816,8 @@ function DailyRewardsPanel.drawStreakItem(list, y, item, alt)
             tostring(row.streak and row.streak.title or row.streakId) .. repeatText,
             contentW - 120
         ),
-        C.LIST_TEXT_PAD,
-        y + C.DETAIL_TEXT_GAP,
+        C.LIST.TEXT_PAD,
+        y + C.DETAIL.TEXT_GAP,
         1,
         1,
         1,
@@ -2812,7 +2826,7 @@ function DailyRewardsPanel.drawStreakItem(list, y, item, alt)
     )
     list:drawText(
         tostring(row.requiredDays or 0) .. " " .. getText("IGUI_DR_Days"),
-        C.LIST_TEXT_PAD,
+        C.LIST.TEXT_PAD,
         y + 20,
         C.COLORS.MUTED.r,
         C.COLORS.MUTED.g,
@@ -2822,8 +2836,8 @@ function DailyRewardsPanel.drawStreakItem(list, y, item, alt)
     )
     list:drawTextRight(
         trimTextToWidth(UIFont.Small, statusText, 92),
-        contentW - C.LIST_TEXT_RIGHT_PAD,
-        y + C.MEDIUM_GAP,
+        contentW - C.LIST.TEXT_RIGHT_PAD,
+        y + C.LAYOUT.GAP_M,
         statusColor.r,
         statusColor.g,
         statusColor.b,
@@ -3009,7 +3023,7 @@ function DailyRewardsPanel:drawSectionTitle(text, x, y, w)
     self:drawText(text, x, y, C.COLORS.TEXT.r, C.COLORS.TEXT.g, C.COLORS.TEXT.b, 1, UIFont.Medium)
     self:drawRect(
         x,
-        y + FONT_HGT_MEDIUM + C.LABEL_OFFSET_Y,
+        y + FONT_HGT_MEDIUM + C.LABEL.OFFSET_Y,
         w,
         1,
         0.75,
@@ -3023,7 +3037,7 @@ local function drawFieldLabel(panel, text, control, width, color)
     panel:drawText(
         trimTextToWidth(UIFont.Small, text, width or control:getWidth()),
         control:getX(),
-        control:getY() - FONT_HGT_SMALL - C.LABEL_ABOVE_GAP,
+        control:getY() - FONT_HGT_SMALL - C.LABEL.ABOVE_GAP,
         color.r,
         color.g,
         color.b,
@@ -3056,12 +3070,12 @@ function DailyRewardsPanel:drawPlayerDetails()
         C.COLORS.BORDER.b
     )
 
-    local x = rect.x + C.PAD
-    local y = rect.y + C.PAD
-    local maxWidth = rect.width - (C.PAD * 2)
+    local x = rect.x + C.LAYOUT.PAD
+    local y = rect.y + C.LAYOUT.PAD
+    local maxWidth = rect.width - (C.LAYOUT.PAD * 2)
 
     self:drawSectionTitle(getText("IGUI_DR_Details"), x, y, maxWidth)
-    y = y + FONT_HGT_MEDIUM + C.LARGE_GAP - 1
+    y = y + FONT_HGT_MEDIUM + C.LAYOUT.GAP_L - 1
     self:drawText(
         trimTextToWidth(
             UIFont.Small,
@@ -3076,7 +3090,7 @@ function DailyRewardsPanel:drawPlayerDetails()
         1,
         UIFont.Small
     )
-    y = y + FONT_HGT_SMALL + C.DETAIL_TEXT_GAP
+    y = y + FONT_HGT_SMALL + C.DETAIL.TEXT_GAP
     self:drawText(
         trimTextToWidth(
             UIFont.Small,
@@ -3091,7 +3105,7 @@ function DailyRewardsPanel:drawPlayerDetails()
         1,
         UIFont.Small
     )
-    y = y + FONT_HGT_SMALL + C.DETAIL_TEXT_GAP
+    y = y + FONT_HGT_SMALL + C.DETAIL.TEXT_GAP
     self:drawText(
         trimTextToWidth(
             UIFont.Small,
@@ -3106,7 +3120,7 @@ function DailyRewardsPanel:drawPlayerDetails()
         1,
         UIFont.Small
     )
-    y = y + FONT_HGT_SMALL + C.STATUS_BAR_GAP
+    y = y + FONT_HGT_SMALL + C.PLAYER.STATUS_BAR_GAP
 
     local row = self:getSelectedDailyRow()
     if row and row.reward then
@@ -3121,7 +3135,7 @@ function DailyRewardsPanel:drawPlayerDetails()
             1,
             UIFont.Medium
         )
-        y = y + FONT_HGT_MEDIUM + C.SMALL_GAP
+        y = y + FONT_HGT_MEDIUM + C.LAYOUT.GAP_S
         self:drawText(
             trimTextToWidth(
                 UIFont.Small,
@@ -3136,7 +3150,7 @@ function DailyRewardsPanel:drawPlayerDetails()
             1,
             UIFont.Small
         )
-        y = y + FONT_HGT_SMALL + C.DETAIL_BLOCK_GAP
+        y = y + FONT_HGT_SMALL + C.DETAIL.BLOCK_GAP
         y =
             drawWrappedText(
                 self,
@@ -3146,9 +3160,9 @@ function DailyRewardsPanel:drawPlayerDetails()
                 maxWidth,
                 C.COLORS.MUTED,
                 UIFont.Small,
-                C.SMALL_GAP
+                C.LAYOUT.GAP_S
             )
-        y = y + C.DETAIL_BLOCK_GAP
+        y = y + C.DETAIL.BLOCK_GAP
         self:drawText(
             getText("IGUI_DR_Rewards"),
             x,
@@ -3159,7 +3173,7 @@ function DailyRewardsPanel:drawPlayerDetails()
             1,
             UIFont.Small
         )
-        y = y + FONT_HGT_SMALL + C.DETAIL_TEXT_GAP
+        y = y + FONT_HGT_SMALL + C.DETAIL.TEXT_GAP
         y =
             drawWrappedText(
                 self,
@@ -3169,9 +3183,9 @@ function DailyRewardsPanel:drawPlayerDetails()
                 maxWidth,
                 C.COLORS.READY,
                 UIFont.Small,
-                C.DETAIL_TEXT_GAP
+                C.DETAIL.TEXT_GAP
             )
-        y = y + C.DETAIL_SECTION_GAP
+        y = y + C.DETAIL.SECTION_GAP
     end
 
     local streakRow = self:getSelectedStreakRow()
@@ -3190,7 +3204,7 @@ function DailyRewardsPanel:drawPlayerDetails()
             1,
             UIFont.Small
         )
-        y = y + FONT_HGT_SMALL + C.DETAIL_TEXT_GAP
+        y = y + FONT_HGT_SMALL + C.DETAIL.TEXT_GAP
         self:drawText(
             trimTextToWidth(
                 UIFont.Small,
@@ -3205,7 +3219,7 @@ function DailyRewardsPanel:drawPlayerDetails()
             1,
             UIFont.Small
         )
-        y = y + FONT_HGT_SMALL + C.LIST_ICON_TEXT_GAP
+        y = y + FONT_HGT_SMALL + C.LIST.ICON_TEXT_GAP
         drawWrappedText(
             self,
             Shared.GetRewardSummary(streakRow.streak.rewards),
@@ -3214,7 +3228,7 @@ function DailyRewardsPanel:drawPlayerDetails()
             maxWidth,
             C.COLORS.READY,
             UIFont.Small,
-            C.LABEL_OFFSET_Y
+            C.LABEL.OFFSET_Y
         )
         return
     end
@@ -3228,7 +3242,7 @@ function DailyRewardsPanel:drawPlayerDetails()
             maxWidth,
             C.COLORS.MUTED,
             UIFont.Small,
-            C.DETAIL_TEXT_GAP
+            C.DETAIL.TEXT_GAP
         )
     end
 end
@@ -3240,7 +3254,7 @@ function DailyRewardsPanel:drawAdminHints()
     self:drawText(
         getText("IGUI_DR_GlobalSettings"),
         self.settingsTickBox:getX(),
-        self.settingsTickBox:getY() - FONT_HGT_SMALL - C.ADMIN_SECTION_TITLE_GAP,
+        self.settingsTickBox:getY() - FONT_HGT_SMALL - C.ADMIN.SECTION_TITLE_GAP,
         text.r,
         text.g,
         text.b,
@@ -3248,12 +3262,12 @@ function DailyRewardsPanel:drawAdminHints()
         UIFont.Small
     )
     local settingsLabelW =
-        self._settingsLabelW or (self._narrowAdminLayout and C.SETTINGS_LABEL_W_NARROW or C.SETTINGS_LABEL_W)
-    local settingsTextW = settingsLabelW - C.LIST_ICON_TEXT_GAP
+        self._settingsLabelW or (self._narrowAdminLayout and C.SETTINGS.LABEL_W_NARROW or C.SETTINGS.LABEL_W)
+    local settingsTextW = settingsLabelW - C.LIST.ICON_TEXT_GAP
     self:drawText(
         trimTextToWidth(UIFont.Small, getText("IGUI_DR_CampaignStartDate"), settingsTextW),
         self.startDateEntry:getX() - settingsLabelW,
-        self.startDateEntry:getY() + C.LABEL_OFFSET_Y,
+        self.startDateEntry:getY() + C.LABEL.OFFSET_Y,
         muted.r,
         muted.g,
         muted.b,
@@ -3263,7 +3277,7 @@ function DailyRewardsPanel:drawAdminHints()
     self:drawText(
         trimTextToWidth(UIFont.Small, getText("IGUI_DR_MaxClaimableDays"), settingsTextW),
         self.maxClaimableDaysEntry:getX() - settingsLabelW,
-        self.maxClaimableDaysEntry:getY() + C.LABEL_OFFSET_Y,
+        self.maxClaimableDaysEntry:getY() + C.LABEL.OFFSET_Y,
         muted.r,
         muted.g,
         muted.b,
@@ -3273,7 +3287,7 @@ function DailyRewardsPanel:drawAdminHints()
     self:drawText(
         trimTextToWidth(UIFont.Small, getText("IGUI_DR_PreviewDays"), settingsTextW),
         self.previewDaysEntry:getX() - settingsLabelW,
-        self.previewDaysEntry:getY() + C.LABEL_OFFSET_Y,
+        self.previewDaysEntry:getY() + C.LABEL.OFFSET_Y,
         muted.r,
         muted.g,
         muted.b,
@@ -3283,7 +3297,7 @@ function DailyRewardsPanel:drawAdminHints()
     self:drawText(
         trimTextToWidth(UIFont.Small, getText("IGUI_DR_StreakGraceDays"), settingsTextW),
         self.resetStreakEntry:getX() - settingsLabelW,
-        self.resetStreakEntry:getY() + C.LABEL_OFFSET_Y,
+        self.resetStreakEntry:getY() + C.LABEL.OFFSET_Y,
         muted.r,
         muted.g,
         muted.b,
@@ -3292,7 +3306,7 @@ function DailyRewardsPanel:drawAdminHints()
     )
 
     local sectionY =
-        self._adminSectionLabelY or (self.adminRewardsList:getY() - FONT_HGT_SMALL - C.ADMIN_SECTION_TITLE_GAP)
+        self._adminSectionLabelY or (self.adminRewardsList:getY() - FONT_HGT_SMALL - C.ADMIN.SECTION_TITLE_GAP)
     self:drawText(
         getText("IGUI_DR_RewardRows"),
         self.adminRewardsList:getX(),
@@ -3390,8 +3404,8 @@ function DailyRewardsPanel:prerender()
     if self.activeTab == "player" then
         self:drawText(
             getText("IGUI_DR_DayGrid"),
-            C.PAD,
-            self.dailyGrid:getY() - FONT_HGT_SMALL - C.ADMIN_SECTION_TITLE_GAP,
+            C.LAYOUT.PAD,
+            self.dailyGrid:getY() - FONT_HGT_SMALL - C.ADMIN.SECTION_TITLE_GAP,
             C.COLORS.TEXT.r,
             C.COLORS.TEXT.g,
             C.COLORS.TEXT.b,
@@ -3400,8 +3414,8 @@ function DailyRewardsPanel:prerender()
         )
         self:drawText(
             getText("IGUI_DR_StreakRewards"),
-            C.PAD,
-            self.streakList:getY() - FONT_HGT_SMALL - C.ADMIN_SECTION_TITLE_GAP,
+            C.LAYOUT.PAD,
+            self.streakList:getY() - FONT_HGT_SMALL - C.ADMIN.SECTION_TITLE_GAP,
             C.COLORS.TEXT.r,
             C.COLORS.TEXT.g,
             C.COLORS.TEXT.b,
@@ -3420,19 +3434,20 @@ function DailyRewardsPanel:render()
         return
     end
 
-    local color = C.COLORS.MUTED
+    local T     = Theme.colors
+    local color = T.textMuted
     if self.statusLevel == "error" then
-        color = C.COLORS.ERROR
+        color = T.danger
     elseif self.statusLevel == "warning" then
-        color = C.COLORS.LOCKED
+        color = T.warning
     elseif self.statusLevel == "info" then
-        color = C.COLORS.CLAIMED
+        color = T.accent
     end
 
-    local y = self.height - C.PAD - FONT_HGT_SMALL
+    local y = self.height - C.LAYOUT.PAD - FONT_HGT_SMALL
     self:drawText(
-        trimTextToWidth(UIFont.Small, self.statusMessage or "", self.width - (C.PAD * 2)),
-        C.PAD,
+        trimTextToWidth(UIFont.Small, self.statusMessage or "", self.width - (C.LAYOUT.PAD * 2)),
+        C.LAYOUT.PAD,
         y,
         color.r,
         color.g,
@@ -3463,8 +3478,8 @@ function DailyRewardsPanel.openPanel(playerObj)
 
     local screenWidth = getCore():getScreenWidth()
     local screenHeight = getCore():getScreenHeight()
-    local width = math.min(C.DEFAULT_W, math.max(C.MIN_W, screenWidth - 40))
-    local height = math.min(C.DEFAULT_H, math.max(C.MIN_H, screenHeight - 40))
+    local width = math.min(C.SIZE.DEFAULT_W, math.max(C.SIZE.MIN_W, screenWidth - 40))
+    local height = math.min(C.SIZE.DEFAULT_H, math.max(C.SIZE.MIN_H, screenHeight - 40))
     local x = math.max(20, math.floor((screenWidth - width) / 2))
     local y = math.max(20, math.floor((screenHeight - height) / 2))
     local panel = DailyRewardsPanel:new(x, y, width, height, playerObj)

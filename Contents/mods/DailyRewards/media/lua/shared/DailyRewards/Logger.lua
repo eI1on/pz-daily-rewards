@@ -1,1 +1,2 @@
-return require("ElyonLib/Core/Logger"):new("Daily Rewards");
+local Logger = require("ElyonLib/Core/Logger")
+return Logger:new("Daily Rewards")
