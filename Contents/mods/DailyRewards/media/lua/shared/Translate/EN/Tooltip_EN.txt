@@ -1,5 +1,4 @@
 Tooltip_EN = {
-
     Tooltip_DR_PlayerTab = "Open your personal reward calendar.",
     Tooltip_DR_AdminTab = "Open server reward configuration and JSON import/export tools.",
     Tooltip_DR_Refresh = "Request a fresh reward snapshot from the server.",

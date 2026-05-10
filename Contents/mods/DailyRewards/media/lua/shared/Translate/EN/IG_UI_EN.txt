@@ -1,5 +1,4 @@
 IGUI_EN = {
-
     IGUI_DR_DailyRewards = "Daily Rewards",
     IGUI_DR_PlayerView = "Player View",
     IGUI_DR_AdminView = "Admin View",

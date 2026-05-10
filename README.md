@@ -1,291 +1,187 @@
-# Daily Rewards
+# Daily Rewards - mod guide
 
-Daily Rewards is a Project Zomboid Build 41 mod that gives players a server-authoritative daily reward calendar, claimable missed days when enabled, and configurable streak rewards.
+**[B41] Daily Rewards** is a calendar-style gate: daily slots you can fill with loot plus optional **streak** bonuses. Players open it from the **ElyonLib menu dock**; the server decides what they may claim today and persists each account’s progress. Works in multiplayer (host authoritative) and singleplayer.
 
-It is built for both singleplayer and multiplayer, with an in-game admin editor so servers do not have to hand-edit JSON just to change rewards.
+**Requires [ElyonLib](https://steamcommunity.com/sharedfiles/filedetails/?id=3384377738)** - list it above Daily Rewards.
 
-## Requirements
+---
 
-- Project Zomboid Build 41
-- ElyonLib
+## Using it in-game
 
-## What The Mod Does
+- Open **Daily Rewards** from the ElyonLib floating menu.
+- The **player** tab shows claimed days, what’s available now, streak progress, and what’s still locked.
+- When the calendar date rolls forward, online players often get an automatic refresh so “today” updates.
 
-- Adds a player view where users can:
-  - see reward days in a grid
-  - inspect daily and streak rewards
-  - claim available daily rewards
-  - claim available streak rewards
-- Adds an admin view where admins can:
-  - enable or disable the system
-  - configure campaign start date
-  - allow or block missed claims
-  - choose preview days
-  - choose streak grace days
-  - edit daily rewards
-  - edit streak rewards
-  - import and export config
-- Supports reward types:
-  - items
-  - XP
-  - custom Lua rewards registered by other mods
+Claims are checked on the server so clients can’t pull rewards early or twice.
 
-## How It Works
+---
 
-### Player Data
+## Admin / server settings
 
-- In multiplayer, player claim data is stored only on the server in Global ModData.
-- Clients receive only their own snapshot.
-- Admins receive the active config in their snapshot so they can edit it in-game.
+Admins get an **Admin** tab in the same window (plus import/export/reset for the config file). The important toggles and fields match what you edit in-game and what ends up in JSON:
 
-### Config Data
+| Field | Plain meaning |
+|--------|----------------|
+| `enabled` | Turn the whole system off without uninstalling. |
+| `startDate` | Fixed first calendar day for everyone (`YYYY-MM-DD`). Leave unset to start each player from when they’re first seen. |
+| `allowMissedClaims` | Off = only today; on = backlog within your history window. |
+| `maxClaimableDays` | How many past days remain claimable (use `0` for “no hard cap” in math terms). |
+| `previewDays` | How far ahead upcoming days appear in the list. |
+| `repeatRewards` | After the last scripted day, loop the ladder from the top again or stop. |
+| `resetStreakAfterMissedDays` | Grace: how sloppy real-life spacing can get before streak logic treats you as breaking the run. |
+| `dailyRewards` | Ordered list of day presets (titles, fluff text, bundles of loot). |
+| `streakRewards` | Milestones keyed on consecutive eligible days (`days`, repeatable tiers, bundles). |
 
-- The active config is stored in `DailyRewardsConfig.json`.
-- Admins normally work through the UI, not by hand-editing JSON.
-- Import and Export are there for backup, sharing, and migration.
+**Save All** writes disk; backups are easiest with **Export** / **Import** of that file.
 
-### Time And Anti-Cheat
+---
 
-- Claim and streak logic uses server time.
-- Daily availability is based on the server day key.
-- Streak rebuilding is authoritative and recalculated from saved claim data.
-- Catch-up claims can collect missed rewards, but they do not magically repair a streak that already broke on the server.
+## Config file (`DailyRewardsConfig.json`)
 
-## Player Guide
+Stores the ladder definitions only - not player inventory. ElyonLib stores it against the Workshop display id **`Daily Rewards`**; filename **`DailyRewardsConfig.json`**. First run may materialize sensible defaults via the normal mod-save path.
 
-### Player View
+Example skeleton:
 
-- Open the Daily Rewards window from the ElyonLib menu.
-- Browse the reward day grid.
-- Click a day tile to inspect it.
-- Claim a daily reward when the selected day is available.
-- Claim a streak reward when the selected streak milestone is available.
-
-### Reward Day States
-
-- `Claimed`: you already took it
-- `Ready`: claimable now
-- `Upcoming`: future reward day
-- `Locked`: not available yet
-
-### Streaks
-
-Streak rewards are based on valid claim progression, not simply on how many total rewards a player has ever claimed.
-
-The important settings are:
-
-- `Allow missed claims`
-- `Streak grace days`
-- `Repeat daily reward list`
-
-## Admin Guide
-
-### Global Settings
-
-- `Enabled`: turns the system on or off
-- `Allow missed claims`: allows older reward days to stay claimable
-- `Repeat daily reward list`: loops the daily reward table after the last configured day
-- `Campaign start date`: fixed global start date; if empty, each player starts from first seen date
-- `Claimable history`: how many past days remain claimable; `0` means unlimited
-- `Preview days`: how many future days players can inspect
-- `Streak grace days`: how many missed real server days are tolerated before the active streak breaks
-
-### Editing Reward Rows
-
-The admin editor has two modes:
-
-- `Daily Days`
-- `Streaks`
-
-For each row you can edit:
-
-- internal id
-- day number or streak days required
-- title
-- description
-- items
-- XP
-- custom Lua rewards
-
-Use `Apply Row` to update the selected row locally in the editor.
-
-Use `Save All` to validate and publish the full config.
-
-Use `Import` and `Export` to move `DailyRewardsConfig.json` in and out of the local Lua folder.
-
-### Reward Editor Syntax
-
-Items:
-
-```text
-Base.WaterBottleFull = 1
-Base.TinnedSoup = 1
+```json
+{
+  "enabled": true,
+  "startDate": null,
+  "allowMissedClaims": true,
+  "maxClaimableDays": 30,
+  "previewDays": 7,
+  "repeatRewards": true,
+  "resetStreakAfterMissedDays": 1,
+  "dailyRewards": [ { "id": "day_1", "title": "Day 1", "rewards": { } } ],
+  "streakRewards": [ { "id": "streak_7", "days": 7, "repeatable": false, "rewards": { } } ]
+}
 ```
 
-XP:
+---
 
-```text
-Cooking = 25
-Woodwork = 15
-```
+## What each reward bundle can contain
 
-Custom rewards:
+Under each calendar row / streak milestone, **`rewards`** bundles four parallel lists (`items`, `xp`, `traits`, `custom`). Omit empty ones.
 
-```text
-DailyRewards.Custom.Halo | message=Reward claimed.
-MyMod.Custom.CrateDrop | displayName=Supply Drop; iconText=SD; crateType=food
-MyMod.Custom.MarkPlayer | displayName=Marked; icon=media/ui/my_mark.png; duration=3
-MyMod.Custom.GiveToken | displayName=Token; icon=Base.Ring_Right_RingFinger_Gold; amount=2
-```
+### Items
 
-## Custom Rewards For Modders
+Entries can be shorthand strings (`"Base.Apple"`) or objects with **`type`** (aliases `item`, `fullType`) and **`count`** (alias `amount`).
 
-Custom rewards let another mod attach arbitrary behavior to a Daily Rewards row.
+### XP
 
-The registration API lives in:
+Objects with **`perk`** (aliases `skill`, `type`) and nonzero **`amount`** (alias `xp`).
 
-- `Contents/mods/DailyRewards/media/lua/shared/DailyRewards/Shared.lua`
+### Traits
 
-### Registering A Handler
+Trait id as a string **or** an object carrying **`trait`** / `type` / `id` / `name`. Invalid or conflicting picks are skipped or error per server rules.
+
+### Custom Lua
+
+Delegates one slice of the grant to **`RegisterCustomReward`** (**see below**). JSON carries at least **`handler`** (your registered id); you may stash any extra fields your Lua reads (`message`, `amount`, etc.).
+
+---
+
+## Custom Lua rewards (technical - other mods)
+
+Run registration **once at load**, on whoever runs server logic in that session (**dedicated process, listen-server host, singleplayer host**):
 
 ```lua
 local DailyRewards = require("DailyRewards/Shared")
-local Shared = DailyRewards.Shared
 
-Shared.RegisterCustomReward("MyMod.Custom.GiveToken", function(player, reward, context)
-    local amount = math.floor(tonumber(reward.amount) or 1)
-
-    for i = 1, amount do
-        player:getInventory():AddItem("Base.Ring_Right_RingFinger_Gold")
-    end
-
-    return true, tostring(amount) .. " token(s)"
-end, {
-    displayName = "Token Reward",
-    icon = "Base.Ring_Right_RingFinger_Gold",
-    iconText = "TK",
-})
+DailyRewards.Shared.RegisterCustomReward(handlerId, function(player, reward, context)
+	-- Grant something; return outcome for the payout summary / errors list.
+	return true, "Shown in Received line"
+end, optionalDefinitionUi)
 ```
 
-### Handler Signature
+Third argument **`optionalDefinitionUi`** is optional `{ displayName, icon, iconText }` defaults for tooling (mirrors thin metadata on **`DailyRewards.Custom.definitions`**; handlers live **`DailyRewards.Custom.handlers[handlerId]`**).
 
-Your handler receives:
+---
 
-- `player`: the target player
-- `reward`: the custom reward entry from config
-- `context`: extra claim context
+### Registration API
 
-The context includes things like:
+Signature in source: **`DailyRewards.Shared.RegisterCustomReward(handlerId, fn, definition)`**
 
-- claim type (`daily` or `streak`)
-- player id
-- date key
-- day number
-- streak id
-- required days
-- today key
+- **`handlerId`**: literal string duplicated in **`rewards.custom[].handler`** inside **`DailyRewardsConfig.json`** / admin editor.
+- **`fn`**: `function(player, reward, context) -> success, summary`
 
-### Return Values
+Return **`true, summaryString`** → summary is appended client-side (**`"Received: "`** concatenates successes).  
 
-Return:
+Return **`false, reason`** → adds to **`errors`** (**`"Reward claimed, but nothing was delivered: "`** paths if nothing else succeeded).
 
-- `true, "summary text"` on success
-- `false, "error text"` on failure
+`reward` arrives after **`Shared.NormalizeRewards`**: cloned custom row **`rewards.custom[i]`**. Always has **`handler`**; **`TableUtils.deepCopy`** keeps every other JSON key (**`amount`**, **`message`**, **`displayName`**, **`icon`**, **`iconText`**, mod-specific payloads…).
 
-The summary text is used in claim feedback.
+`context` is built in **`Server.ServerCommands.ClaimDaily`** / **`ClaimStreak`** and passed into **`grantCustomReward`** alongside the same `player` / `reward` row.
 
-### Optional Registry Metadata
-
-The third argument to `RegisterCustomReward` is optional metadata:
-
-- `displayName`: player-facing name for summaries and previews
-- `icon`: texture path or item full type
-- `iconText`: optional short fallback text for the preview tile
-
-Example:
+**Daily claim context** (`Server.lua`):
 
 ```lua
-Shared.RegisterCustomReward("MyMod.Custom.MarkPlayer", function(player, reward, context)
-    player:setHaloNote("Marked", 255, 200, 50, 300)
-    return true, "Marked"
-end, {
-    displayName = "Mark Player",
-    icon = "media/ui/my_mark.png",
-    iconText = "MK",
-})
+{
+	type = "daily",
+	playerId = playerId,          -- Shared.GetPlayerKey(player)
+	dateKey = row.dateKey,
+	dayNumber = row.dayNumber,
+	reward = row.reward,          -- full normalized daily row (includes nested .rewards)
+	todayKey = todayKey,
+}
 ```
 
-### Per-Reward UI Overrides
+Grant body for that slice: **`Server.GrantRewards(player, row.reward.rewards, context)`** - your **`reward`** argument to Lua is **only** the **`custom`** sub-entry, **`context.reward`** references the wrapping day row envelope.
 
-A specific reward row can override the registered metadata:
+**Streak claim context:**
 
-```text
-MyMod.Custom.MarkPlayer | displayName=Marked 3 Days; iconText=M3; duration=3
+```lua
+{
+	type = "streak",
+	playerId = playerId,
+	streakId = row.streakId,
+	claimKey = row.claimKey,
+	requiredDays = row.requiredDays,
+	streak = row.streak,          -- streak milestone envelope (nested .rewards)
+	todayKey = todayKey,
+}
 ```
 
-Supported override keys:
+Grant path: **`Server.GrantRewards(player, row.streak.rewards, context)`**
 
-- `displayName`
-- `icon`
-- `iconText`
+---
 
-Everything else on the line is passed through to your handler unchanged.
+### Copy-ready examples
 
-### Choosing Icons
+**Halo toast** (`rewards.custom` extras: **`message`**)
 
-`icon` can be:
+```lua
+local DailyRewards = require("DailyRewards/Shared")
 
-- a texture path, for example `media/ui/my_icon.png`
-- a valid item full type, for example `Base.Ring_Right_RingFinger_Gold`
-- an `Item_` texture name if you already know the texture id
+DailyRewards.Shared.RegisterCustomReward("MyMod.Custom.Halo", function(player, reward, context)
+	local TextUtils = require("ElyonLib/TextUtils/TextUtils")
+	local message = TextUtils.trim(reward.message or "")
+	if message == "" then message = "Reward claimed." end
+	if player and player.setHaloNote then
+		player:setHaloNote(message, 255, 255, 255, 500)
+	end
+	return true, message
+end, { displayName = "Halo pop", iconText = "★" })
+```
 
-If no texture resolves, the tile falls back to `iconText`.
+JSON:
 
-If no `iconText` is provided, Daily Rewards does not generate one automatically.
+```json
+"custom": [ { "handler": "MyMod.Custom.Halo", "message": "Welcome back!" } ]
+```
 
-## Code Map
+---
 
-### Shared.lua
+**Spawn item stacks** (`rewards.custom` extras: **`amount`**, **`itemType`** fallback)
 
-Main shared model and normalization layer:
-
-- default config
-- reward normalization
-- streak rebuilding
-- custom reward registry
-- config load/save
-
-### Server.lua
-
-Authoritative reward flow:
-
-- builds per-player snapshots
-- validates claims
-- grants items, XP, and custom rewards
-- keeps multiplayer state server-side
-
-### Client.lua
-
-Thin client transport layer:
-
-- receives snapshots
-- forwards UI messages
-- requests initial data from the server
-
-### DailyRewardsPanel.lua
-
-Actual game UI:
-
-- player calendar
-- admin editor
-- reward preview tiles
-- import/export buttons
-
-## Important Implementation Notes
-
-- The mod treats multiplayer as server-authoritative.
-- Config is file-backed, player progress is ModData-backed.
-- Custom reward metadata is split into:
-  - handler registration defaults
-  - per-row overrides
-- Item names and item icons are resolved through ElyonLib item utilities with caching.
+```lua
+DailyRewards.Shared.RegisterCustomReward("MyMod.Custom.Stack", function(player, reward, context)
+	local TextUtils = require("ElyonLib/TextUtils/TextUtils")
+	local amount = math.floor(tonumber(reward.amount) or 1)
+	local itemType = TextUtils.trim(reward.itemType or "")
+	if itemType == "" then itemType = "Base.Apple" end
+	local inv = player and player:getInventory()
+	if not inv then return false, "No inventory" end
+	for _ = 1, amount do inv:AddItem(itemType) end
+	return true, ("%d × %s"):format(amount, itemType)
+end, { displayName = "Lua item stack", icon = "Base.Apple" })
+```

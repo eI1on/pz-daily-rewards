@@ -1,7 +1,7 @@
 name=[B41] Daily Rewards
 poster=poster.png
 id=DailyRewards
-description=Server-authoritative daily and streak rewards with in-game admin configuration and custom reward handlers.
+description=Server-side daily calendar & streak milestones: claim items/XP/traits/custom Lua rewards from the ElyonLib dock; admins configure import/export JSON in-game. Requires ElyonLib first.
 require=ElyonLib
 tags=Build 41,Misc,Multiplayer,Interface
 versionMin=41.0

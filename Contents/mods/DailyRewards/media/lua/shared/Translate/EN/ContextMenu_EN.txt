@@ -1,5 +1,0 @@
-ContextMenu_EN = {
-
-    ContextMenu_DR_OpenDailyRewards = "Daily Rewards",
-
-}
