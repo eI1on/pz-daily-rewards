@@ -6,15 +6,18 @@ require("ISUI/ISTextEntryBox")
 require("ISUI/ISTickBox")
 
 local DailyRewards = require("DailyRewards/Shared")
-local ColorUtils = require("ElyonLib/ColorUtils/ColorUtils")
 local Theme = require("ElyonLib/UI/Theme/Theme")
 local DateTimeUtility = require("ElyonLib/DateTime/DateTimeUtility")
 local DateTimeSelector = require("ElyonLib/UI/Calendar/DateTimeSelector")
 local FileUtils = require("ElyonLib/FileUtils/FileUtils")
 local ItemUtils = require("ElyonLib/ItemUtils/ItemUtils")
 local MathUtils = require("ElyonLib/MathUtils/MathUtils")
+local PerkUtils = require("ElyonLib/PlayerUtils/PerkUtils")
+local PlayerUtils = require("ElyonLib/PlayerUtils/PlayerUtils")
 local TableUtils = require("ElyonLib/TableUtils/TableUtils")
 local TextUtils = require("ElyonLib/TextUtils/TextUtils")
+local TraitUtils = require("ElyonLib/PlayerUtils/TraitUtils")
+local LayoutUtils = require("ElyonLib/UI/Layout/LayoutUtils")
 local UIUtils = require("ElyonLib/UI/Utils/UIUtils")
 
 local DailyRewardsPanel = ISCollapsableWindow:derive("DailyRewardsPanel")
@@ -125,92 +128,9 @@ local C = {
 	COLORS = Theme.standardColors(),
 }
 
-local ICON_CACHE = {
-	custom = {},
-	skills = {},
-	traits = {},
-}
-
-local SKILL_TEXTURES = {
-	Accuracy = "media/ui/ElyonLib/ui_skill_spiffo_accuracy.png",
-	Agility = "media/ui/ElyonLib/ui_skill_spiffo_agility.png",
-	Aiming = "media/ui/ElyonLib/ui_skill_spiffo_aiming.png",
-	Axe = "media/ui/ElyonLib/ui_skill_spiffo_axe.png",
-	Blunt = "media/ui/ElyonLib/ui_skill_spiffo_blunt.png",
-	Carpentry = "media/ui/ElyonLib/ui_skill_spiffo_carpentry.png",
-	Combat = "media/ui/ElyonLib/ui_skill_spiffo_combat.png",
-	Cooking = "media/ui/ElyonLib/ui_skill_spiffo_cooking.png",
-	Crafting = "media/ui/ElyonLib/ui_skill_spiffo_crafting.png",
-	Doctor = "media/ui/ElyonLib/ui_skill_spiffo_first_aid.png",
-	Electricity = "media/ui/ElyonLib/ui_skill_spiffo_electricity.png",
-	Farming = "media/ui/ElyonLib/ui_skill_spiffo_farming.png",
-	Firearm = "media/ui/ElyonLib/ui_skill_spiffo_firearm.png",
-	Fishing = "media/ui/ElyonLib/ui_skill_spiffo_fishing.png",
-	Fitness = "media/ui/ElyonLib/ui_skill_spiffo_fitness.png",
-	Lightfoot = "media/ui/ElyonLib/ui_skill_spiffo_lightfooted.png",
-	Lightfooted = "media/ui/ElyonLib/ui_skill_spiffo_lightfooted.png",
-	LongBlade = "media/ui/ElyonLib/ui_skill_spiffo_long_blade.png",
-	Maintenance = "media/ui/ElyonLib/ui_skill_spiffo_maintenance.png",
-	Mechanics = "media/ui/ElyonLib/ui_skill_spiffo_mechanics.png",
-	MetalWelding = "media/ui/ElyonLib/ui_skill_spiffo_metalworking.png",
-	Nimble = "media/ui/ElyonLib/ui_skill_spiffo_nimble.png",
-	None = nil,
-	PlantScavenging = "media/ui/ElyonLib/ui_skill_spiffo_plant_scavenging.png",
-	Reloading = "media/ui/ElyonLib/ui_skill_spiffo_reloading.png",
-	SmallBlade = "media/ui/ElyonLib/ui_skill_spiffo_small_blade.png",
-	SmallBlunt = "media/ui/ElyonLib/ui_skill_spiffo_small_blunt.png",
-	Sneak = "media/ui/ElyonLib/ui_skill_spiffo_sneaking.png",
-	Sneaking = "media/ui/ElyonLib/ui_skill_spiffo_sneaking.png",
-	Spear = "media/ui/ElyonLib/ui_skill_spiffo_spear.png",
-	Sprinting = "media/ui/ElyonLib/ui_skill_spiffo_sprinting.png",
-	Strength = "media/ui/ElyonLib/ui_skill_spiffo_strength.png",
-	Survivalist = "media/ui/ElyonLib/ui_skill_spiffo_survivalist.png",
-	Tailoring = "media/ui/Traits/trait_tailor.png",
-	Trapping = "media/ui/ElyonLib/ui_skill_spiffo_trapping.png",
-	Woodwork = "media/ui/ElyonLib/ui_skill_spiffo_carpentry.png",
-}
-
-local SKILL_LABELS = {
-	Accuracy = "ACC",
-	Agility = "AGY",
-	Aiming = "AIM",
-	Axe = "BAA",
-	Blunt = "BUA",
-	Carpentry = "CRP",
-	Combat = "CMB",
-	Cooking = "COO",
-	Crafting = "CFT",
-	Doctor = "AID",
-	Electricity = "ELC",
-	Farming = "FRM",
-	Firearm = "FIR",
-	Fishing = "FIS",
-	Fitness = "FIT",
-	Lightfoot = "LFT",
-	Lightfooted = "LFT",
-	LongBlade = "LBA",
-	Maintenance = "MNT",
-	Mechanics = "MCH",
-	MetalWelding = "MTL",
-	Nimble = "NIM",
-	None = "NON",
-	PlantScavenging = "FOR",
-	Reloading = "REL",
-	SmallBlade = "SBA",
-	SmallBlunt = "SBU",
-	Sneak = "SNE",
-	Sneaking = "SNE",
-	Spear = "SPR",
-	Sprinting = "SPT",
-	Strength = "STR",
-	Survivalist = "SUR",
-	Tailoring = "TAL",
-	Trapping = "TRA",
-	Woodwork = "WW",
-}
+local CUSTOM_ICON_CACHE = {}
 
 local parseNumber = MathUtils.parseNumber
-local copyColor = ColorUtils.copy
 local dateKeyToDateTable = DateTimeUtility.dateKeyToDateTable
 local dateTableToDateKey = DateTimeUtility.dateTableToDateKey
 local drawWrappedText = UIUtils.drawWrappedText
@@ -221,6 +141,7 @@ local getItemScript = ItemUtils.getScriptItem
 local getItemTexture = ItemUtils.getTexture
 local getTextureFromReference = ItemUtils.getTextureFromReference
 local getListContentWidth = UIUtils.getListContentWidth
+local getListContentRight = UIUtils.getListContentRight
 local measure = TextUtils.measureWidth
 local setBounds = UIUtils.setBounds
 local setEntryText = UIUtils.setEntryText
@@ -229,33 +150,27 @@ local setVisible = UIUtils.setVisible
 local trim = TextUtils.trim
 local trimTextToWidth = TextUtils.trimToWidth
 local copyValue = TableUtils.deepCopy
+local drawClippedListRow = UIUtils.drawClippedListRow
+local drawFieldLabel = UIUtils.drawFieldLabel
+local getDataLines = TextUtils.getDataLines
+local getSkillDisplayName = PerkUtils.getDisplayName
+local getSkillLabel = PerkUtils.getShortLabel
+local getSkillTexture = PerkUtils.getTexture
+local getRewardSkillOptions = PerkUtils.getOptions
+local getRewardTraitOptions = TraitUtils.getOptions
+local getTraitLabel = TraitUtils.getLabel
+local getTraitShortLabel = TraitUtils.getShortLabel
+local getTraitTexture = TraitUtils.getTexture
+local getTraitTooltip = TraitUtils.getTooltip
+local snapshotBelongsToPlayer = PlayerUtils.isDataForPlayer
 local drawRewardIconTile
-
-local function calculateDailyTileWidth(contentWidth, columns)
-	return math.floor((contentWidth - C.GRID.TILE_GAP - (C.GRID.TILE_GAP * columns)) / columns)
-end
-
-local function getDailyGridColumnsForWidth(contentWidth)
-	local columns = C.GRID.COLUMNS
-	while columns > C.GRID.MIN_COLUMNS do
-		if calculateDailyTileWidth(contentWidth, columns) >= C.GRID.TILE_MIN_W then
-			break
-		end
-		columns = columns - 1
-	end
-	return columns
-end
-
-local function applyButtonStyle(button, variant)
-	Theme.applyButtonStyle(button, variant)
-end
 
 local function addButton(panel, x, y, w, text, internal, variant)
 	local button = ISButton:new(x, y, w, C.CTRL.BUTTON_H, text, panel, DailyRewardsPanel.onClick)
 	button.internal = internal
 	button:initialise()
 	button:instantiate()
-	applyButtonStyle(button, variant)
+	Theme.applyButtonStyle(button, variant)
 	panel:addChild(button)
 	return button
 end
@@ -263,25 +178,6 @@ end
 local function applyListStyle(list)
 	Theme.applyListStyle(list)
 	list.drawBorder = true
-end
-
-local function applyComboStyle(combo)
-	if not combo then
-		return
-	end
-	local T = Theme.colors
-	combo.backgroundColor = Theme.copy(T.panel)
-	combo.backgroundColorMouseOver = Theme.copy(T.primary)
-	combo.borderColor = Theme.copy(T.border)
-	combo.textColor = Theme.copy(T.text)
-end
-
-local function applyTickBoxStyle(tickBox)
-	if not tickBox then
-		return
-	end
-	tickBox.borderColor = Theme.copy(Theme.colors.border)
-	tickBox.choicesColor = Theme.copy(Theme.colors.text)
 end
 
 local function addEntry(panel, x, y, w, h, multiline, maxLines)
@@ -301,7 +197,7 @@ local function addCombo(panel, x, y, w, onChange)
 	local combo = ISComboBox:new(x, y, w, C.CTRL.FIELD_H, panel, onChange)
 	combo:initialise()
 	combo:instantiate()
-	applyComboStyle(combo)
+	Theme.applyComboStyle(combo)
 	panel:addChild(combo)
 	return combo
 end
@@ -321,43 +217,6 @@ local function addDataList(panel, x, y, w, h, itemHeight, drawFn, mouseFn, kind)
 	return list
 end
 
-local function getVisibleListScrollBarWidth(list)
-	if list and list.vscroll and list.isVScrollBarVisible and list:isVScrollBarVisible() then
-		return list.vscroll:getWidth()
-	end
-	return 0
-end
-
-local function getListContentRight(list, rightInset)
-	return list:getWidth() - getVisibleListScrollBarWidth(list) - (rightInset or 0)
-end
-
-local function getListStencilBounds(list, y, height)
-	local clipX = list.drawBorder and 1 or 0
-	local clipY = math.max(0, y + list:getYScroll())
-	local clipX2 = list:isVScrollBarVisible() and (list.vscroll.x + C.LIST.SCROLLBAR_CLIP_PAD)
-		or (list:getWidth() - (list.drawBorder and 1 or 0))
-	local clipY2 = math.min(list:getHeight() - (list.drawBorder and 1 or 0), y + height + list:getYScroll())
-
-	if clipX2 <= clipX or clipY2 <= clipY then
-		return nil
-	end
-
-	return clipX, clipY, clipX2 - clipX, clipY2 - clipY
-end
-
-local function drawClippedListRow(list, y, height, drawFn)
-	local clipX, clipY, clipW, clipH = getListStencilBounds(list, y, height)
-	if not clipX then
-		return
-	end
-
-	list:setStencilRect(clipX, clipY, clipW, clipH)
-	drawFn()
-	list:clearStencilRect()
-	list:repaintStencilRect(clipX, clipY, clipW, clipH)
-end
-
 local function getDailyStatus(row)
 	if not row then
 		return "", C.COLORS.LOCKED
@@ -374,149 +233,18 @@ local function getDailyStatus(row)
 	return getText("IGUI_DR_Locked"), C.COLORS.LOCKED
 end
 
-local function getSkillTexture(perkName)
-	perkName = trim(perkName)
-	if perkName == "" then
-		return nil
-	end
-	if ICON_CACHE.skills[perkName] ~= nil then
-		return ICON_CACHE.skills[perkName] or nil
-	end
-
-	local texturePath = SKILL_TEXTURES[perkName]
-	local texture = texturePath and getTexture(texturePath) or nil
-	ICON_CACHE.skills[perkName] = texture or false
-	return texture
-end
-
-local function getSkillLabel(perkName)
-	perkName = trim(perkName)
-	return SKILL_LABELS[perkName] or perkName:sub(1, 3):upper()
-end
-
-local function getSkillDisplayName(perkName)
-	perkName = trim(perkName)
-	local perk = Perks[perkName]
-	if not perk and Perks.FromString then
-		perk = Perks.FromString(perkName)
-	end
-	if perk then
-		local perkInfo = PerkFactory.getPerk(perk)
-		if perkInfo and perkInfo.getName then
-			return perkInfo:getName()
-		end
-	end
-	return perkName
-end
-
-local function getTraitTexture(traitType)
-	traitType = trim(traitType)
-	if traitType == "" then
-		return nil
-	end
-	if ICON_CACHE.traits[traitType] ~= nil then
-		return ICON_CACHE.traits[traitType] or nil
-	end
-
-	local trait = TraitFactory.getTrait(traitType) or nil
-	local texture = trait and trait.getTexture and trait:getTexture() or nil
-	ICON_CACHE.traits[traitType] = texture or false
-	return texture
-end
-
-local function getTraitLabel(traitType)
-	local traitInfo = Shared.GetTraitInfo(traitType)
-	return traitInfo and traitInfo.label or trim(tostring(traitType or "Trait"))
-end
-
-local function getTraitShortLabel(traitType)
-	local compact = getTraitLabel(traitType):gsub("[%s%p_]+", ""):upper()
-	if #compact >= 3 then
-		return compact:sub(1, 3)
-	end
-	if compact ~= "" then
-		return compact
-	end
-	return "TR"
-end
-
-local function getTraitTooltip(traitType)
-	local traitInfo = Shared.GetTraitInfo(traitType)
-	if not traitInfo then
-		return tostring(traitType or "")
-	end
-
-	local polarity = traitInfo.positive and "+" or "-"
-	local description = trim(traitInfo.description)
-	if description ~= "" then
-		return string.format("%s %s\n%s", polarity, traitInfo.label, description)
-	end
-	return string.format("%s %s", polarity, traitInfo.label)
-end
-
-local function getRewardSkillOptions()
-	if DailyRewardsPanel.SkillRewardOptions then
-		return DailyRewardsPanel.SkillRewardOptions
-	end
-
-	local result = {}
-	for i = 1, Perks.getMaxIndex() do
-		local perk = PerkFactory.getPerk(Perks.fromIndex(i - 1))
-		if perk and perk:getParent() ~= Perks.None then
-			local perkType = tostring(perk:getType())
-			local parentName = PerkFactory.getPerkName(perk:getParent())
-			local label = perk:getName()
-			local text = label
-			if parentName and parentName ~= "" then
-				text = string.format("%s (%s)", label, parentName)
-			end
-			result[#result + 1] = {
-				type = perkType,
-				label = label,
-				text = text,
-			}
-		end
-	end
-	table.sort(result, function(a, b)
-		return tostring(a.label):lower() < tostring(b.label):lower()
-	end)
-	DailyRewardsPanel.SkillRewardOptions = result
-	return result
-end
-
-local function getRewardTraitOptions()
-	if DailyRewardsPanel.TraitRewardOptions then
-		return DailyRewardsPanel.TraitRewardOptions
-	end
-
-	local source = Shared.GetTraitList()
-	local result = {}
-	for i = 1, #source do
-		local trait = source[i]
-		result[#result + 1] = {
-			type = trait.type,
-			label = trait.label,
-			description = trait.description,
-			positive = trait.positive == true,
-			text = string.format("%s %s", trait.positive and "[+]" or "[-]", trait.label),
-		}
-	end
-	DailyRewardsPanel.TraitRewardOptions = result
-	return result
-end
-
 local function getCustomRewardTexture(custom)
 	local icon = Shared.GetCustomRewardIcon(custom)
 	icon = trim(icon)
 	if icon == "" then
 		return nil
 	end
-	if ICON_CACHE.custom[icon] ~= nil then
-		return ICON_CACHE.custom[icon] or nil
+	if CUSTOM_ICON_CACHE[icon] ~= nil then
+		return CUSTOM_ICON_CACHE[icon] or nil
 	end
 
 	local texture = getTextureFromReference(icon)
-	ICON_CACHE.custom[icon] = texture or false
+	CUSTOM_ICON_CACHE[icon] = texture or false
 	return texture
 end
 
@@ -628,21 +356,9 @@ local function buildDailyTooltip(row)
 	)
 end
 
-local function eachDataLine(text)
-	local lines = {}
-	text = tostring(text or ""):gsub("\r\n", "\n"):gsub("\r", "\n")
-	for rawLine in (text .. "\n"):gmatch("(.-)\n") do
-		local line = trim(rawLine)
-		if line ~= "" and line:sub(1, 1) ~= "#" and line:sub(1, 2) ~= "--" then
-			lines[#lines + 1] = line
-		end
-	end
-	return lines
-end
-
 local function parseCustomLines(text)
 	local out = {}
-	local lines = eachDataLine(text)
+	local lines = getDataLines(text)
 	for i = 1, #lines do
 		local line = lines[i]
 		local handler, params = line:match("^([^|]+)%s*|%s*(.*)$")
@@ -650,7 +366,7 @@ local function parseCustomLines(text)
 		if handler ~= "" then
 			local entry = { handler = handler }
 			params = params or ""
-			for token in (params .. ""):gmatch("(.-)") do
+			for token in params:gmatch("([^;]+)") do
 				local key, value = token:match("^%s*([^=]+)%s*=%s*(.-)%s*$")
 				key = trim(key)
 				if key ~= "" then
@@ -692,7 +408,7 @@ local function formatCustom(rewards)
 			parts[#parts + 1] = tostring(key) .. "=" .. tostring(custom[key])
 		end
 		if #parts > 0 then
-			lines[#lines + 1] = tostring(custom.handler or "") .. " | " .. table.concat(parts, " ")
+			lines[#lines + 1] = tostring(custom.handler or "") .. " | " .. table.concat(parts, "; ")
 		else
 			lines[#lines + 1] = tostring(custom.handler or "")
 		end
@@ -719,7 +435,8 @@ function DailyRewardsPanel:new(x, y, width, height, playerObj)
 	self.__index = self
 
 	o.playerObj = playerObj or getPlayer()
-	o.snapshot = DailyRewards.ClientSnapshot or {}
+	local cachedSnapshot = DailyRewards.ClientSnapshot
+	o.snapshot = snapshotBelongsToPlayer(cachedSnapshot, o.playerObj) and cachedSnapshot or {}
 	o.activeTab = "player"
 	o.statusMessage = getText("IGUI_DR_StatusLoading")
 	o.statusLevel = "info"
@@ -845,7 +562,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
 	self.settingsTickBox:addOption(getText("IGUI_DR_Enabled"))
 	self.settingsTickBox:addOption(getText("IGUI_DR_AllowMissedClaims"))
 	self.settingsTickBox:addOption(getText("IGUI_DR_RepeatDailyRewards"))
-	applyTickBoxStyle(self.settingsTickBox)
+	Theme.applyTickBoxStyle(self.settingsTickBox)
 	self:addChild(self.settingsTickBox)
 
 	local fieldX = C.SETTINGS.FIELD_X
@@ -935,7 +652,7 @@ function DailyRewardsPanel:createAdminChildren(contentY)
 	self.rewardRepeatTickBox:initialise()
 	self.rewardRepeatTickBox:instantiate()
 	self.rewardRepeatTickBox:addOption(getText("IGUI_DR_Repeatable"))
-	applyTickBoxStyle(self.rewardRepeatTickBox)
+	Theme.applyTickBoxStyle(self.rewardRepeatTickBox)
 	self:addChild(self.rewardRepeatTickBox)
 
 	self.rewardDescriptionEntry =
@@ -1209,9 +926,10 @@ function DailyRewardsPanel:layoutChildren(force)
 	local x = C.LAYOUT.PAD
 	local y = C.LAYOUT.TOP
 	setBounds(self.playerTabBtn, x, y, C.CTRL.TAB_W, C.CTRL.BUTTON_H)
-	x = x + C.CTRL.TAB_W + C.LAYOUT.GAP
-	setBounds(self.adminTabBtn, x, y, C.CTRL.TAB_W, C.CTRL.BUTTON_H)
-	x = x + C.CTRL.TAB_W + C.LAYOUT.GAP
+	setBounds(self.adminTabBtn, x + C.CTRL.TAB_W + C.LAYOUT.GAP, y, C.CTRL.TAB_W, C.CTRL.BUTTON_H)
+	if self:isAdmin() then
+		x = x + (C.CTRL.TAB_W + C.LAYOUT.GAP) * 2
+	end
 	setBounds(self.refreshBtn, x, y, C.CTRL.REFRESH_W, C.CTRL.BUTTON_H)
 
 	local contentY = y + C.CTRL.BUTTON_H + C.LAYOUT.GAP
@@ -1229,12 +947,19 @@ function DailyRewardsPanel:layoutChildren(force)
 	end
 
 	local dailyContentW = leftW - getListScrollBarWidth(self.dailyGrid)
-	local columns = getDailyGridColumnsForWidth(dailyContentW)
+	local columns = LayoutUtils.fitGridColumns(
+		dailyContentW,
+		C.GRID.COLUMNS,
+		C.GRID.MIN_COLUMNS,
+		C.GRID.TILE_MIN_W,
+		C.GRID.TILE_GAP,
+		C.GRID.TILE_GAP
+	)
 	local repopulateDailyGrid = self.dailyGridColumns ~= columns
 	self.dailyGridColumns = columns
 	self.dailyGrid.dailyRewardColumns = columns
 	self.dailyGrid.reserveScrollBarSpace = true
-	local tileW = calculateDailyTileWidth(dailyContentW, columns)
+	local tileW = LayoutUtils.gridCellWidth(dailyContentW, columns, C.GRID.TILE_GAP, C.GRID.TILE_GAP)
 	self.dailyGrid.itemheight = math.max(112, math.min(140, tileW + 24))
 	local actionY = statusTop - C.CTRL.BUTTON_H
 	local streakH = math.max(104, math.min(132, math.floor(height * 0.16)))
@@ -1549,10 +1274,7 @@ function DailyRewardsPanel:layoutChildren(force)
 end
 
 function DailyRewardsPanel:isAdmin()
-	if self.snapshot and self.snapshot.isAdmin ~= nil then
-		return self.snapshot.isAdmin == true
-	end
-	return Shared.PlayerHasAdminAccess(self.playerObj)
+	return self.snapshot.isAdmin == true and snapshotBelongsToPlayer(self.snapshot, self.playerObj)
 end
 
 function DailyRewardsPanel:setStatus(message, level)
@@ -1561,7 +1283,11 @@ function DailyRewardsPanel:setStatus(message, level)
 end
 
 function DailyRewardsPanel:onSnapshotReceived(snapshot)
-	self.snapshot = snapshot or {}
+	if not snapshotBelongsToPlayer(snapshot, self.playerObj) then
+		return
+	end
+
+	self.snapshot = snapshot
 	if self.snapshot.message and self.snapshot.message ~= "" then
 		self:setStatus(self.snapshot.message, self.snapshot.level or "info")
 	else
@@ -1569,6 +1295,7 @@ function DailyRewardsPanel:onSnapshotReceived(snapshot)
 	end
 	self:populateFromSnapshot()
 	self:updateModeVisibility()
+	self:layoutChildren(true)
 end
 
 function DailyRewardsPanel:populateFromSnapshot()
@@ -2241,6 +1968,7 @@ end
 
 function DailyRewardsPanel:updateModeVisibility()
 	local isAdmin = self:isAdmin()
+	self.playerTabBtn:setVisible(isAdmin)
 	self.adminTabBtn:setVisible(isAdmin)
 
 	if not isAdmin and self.activeTab == "admin" then
@@ -2259,10 +1987,10 @@ function DailyRewardsPanel:updateModeVisibility()
 
 	setVisible(self.rewardRepeatTickBox, showAdmin and self.adminMode == "streak")
 
-	applyButtonStyle(self.playerTabBtn, showPlayer and "primary" or nil)
-	applyButtonStyle(self.adminTabBtn, showAdmin and "primary" or nil)
-	applyButtonStyle(self.adminDailyModeBtn, showAdmin and self.adminMode == "daily" and "primary" or nil)
-	applyButtonStyle(self.adminStreakModeBtn, showAdmin and self.adminMode == "streak" and "primary" or nil)
+	Theme.applyButtonStyle(self.playerTabBtn, showPlayer and "primary" or nil)
+	Theme.applyButtonStyle(self.adminTabBtn, showAdmin and "primary" or nil)
+	Theme.applyButtonStyle(self.adminDailyModeBtn, showAdmin and self.adminMode == "daily" and "primary" or nil)
+	Theme.applyButtonStyle(self.adminStreakModeBtn, showAdmin and self.adminMode == "streak" and "primary" or nil)
 end
 
 function DailyRewardsPanel:getSelectedDailyRow()
@@ -2382,7 +2110,7 @@ function DailyRewardsPanel.drawRewardItemListItem(list, y, item, alt)
 			1,
 			UIFont.Small
 		)
-	end)
+	end, C.LIST.SCROLLBAR_CLIP_PAD)
 	return y + list.itemheight
 end
 
@@ -2435,7 +2163,7 @@ function DailyRewardsPanel.drawRewardXpListItem(list, y, item, alt)
 			1,
 			UIFont.Small
 		)
-	end)
+	end, C.LIST.SCROLLBAR_CLIP_PAD)
 	return y + list.itemheight
 end
 
@@ -2478,7 +2206,7 @@ function DailyRewardsPanel.drawRewardTraitListItem(list, y, item, alt)
 			1,
 			UIFont.Small
 		)
-	end)
+	end, C.LIST.SCROLLBAR_CLIP_PAD)
 	return y + list.itemheight
 end
 
@@ -2606,7 +2334,7 @@ local function getDailyTileMetrics(list)
 		or C.GRID.COLUMNS
 	local gap = C.GRID.TILE_GAP
 	local contentW = getListContentWidth(list, list.reserveScrollBarSpace == true)
-	local tileW = calculateDailyTileWidth(contentW, columns)
+	local tileW = LayoutUtils.gridCellWidth(contentW, columns, gap, gap)
 	local tileH = list.itemheight - (gap * 2)
 	return columns, gap, tileW, tileH
 end
@@ -2916,16 +2644,12 @@ function DailyRewardsPanel.onSettingChanged(target, index, selected, arg1, arg2,
 	end
 end
 
-local function getConfigFilePath()
-	return Core.getMyDocumentFolder() .. getFileSeparator() .. "Lua" .. getFileSeparator() .. DailyRewards.CONFIG_FILE
-end
-
 function DailyRewardsPanel:exportAdminConfig()
 	self:saveAdminEditorToSelected()
 	local config = Shared.NormalizeConfig(self.adminConfig or self.snapshot.config or Shared.GetDefaultConfig())
 	local success =
 		FileUtils.writeJson(DailyRewards.CONFIG_FILE, config, DailyRewards.FILE_MOD_ID, { createIfNull = true })
-	local path = getConfigFilePath()
+	local path = FileUtils.getLuaFilePath(DailyRewards.CONFIG_FILE)
 	if success then
 		self:setStatus(getText("IGUI_DR_StatusConfigExported") .. " " .. path, "info")
 		if isDesktopOpenSupported and isDesktopOpenSupported() then
@@ -3032,19 +2756,6 @@ function DailyRewardsPanel:drawSectionTitle(text, x, y, w)
 		C.COLORS.BORDER.r,
 		C.COLORS.BORDER.g,
 		C.COLORS.BORDER.b
-	)
-end
-
-local function drawFieldLabel(panel, text, control, width, color)
-	panel:drawText(
-		trimTextToWidth(UIFont.Small, text, width or control:getWidth()),
-		control:getX(),
-		control:getY() - FONT_HGT_SMALL - C.LABEL.ABOVE_GAP,
-		color.r,
-		color.g,
-		color.b,
-		1,
-		UIFont.Small
 	)
 end
 

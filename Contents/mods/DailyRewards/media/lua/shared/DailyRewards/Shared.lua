@@ -1,6 +1,6 @@
-local Globals = require("ElyonLib/Core/Globals")
 local AccessLevelUtils = require("ElyonLib/PlayerUtils/AccessLevelUtils")
 local PlayerUtils = require("ElyonLib/PlayerUtils/PlayerUtils")
+local TraitUtils = require("ElyonLib/PlayerUtils/TraitUtils")
 local NetUtils = require("ElyonLib/Net/NetUtils")
 local FileUtils = require("ElyonLib/FileUtils/FileUtils")
 local ItemUtils = require("ElyonLib/ItemUtils/ItemUtils")
@@ -14,7 +14,7 @@ local DailyRewards = {}
 
 DailyRewards.Shared = {}
 DailyRewards.MODULE = "DailyRewards"
-DailyRewards.VERSION = "0.0.1"
+DailyRewards.VERSION = "0.0.2"
 DailyRewards.DATA_SCHEMA_VERSION = 1
 DailyRewards.CONFIG_FILE = "DailyRewardsConfig.json"
 DailyRewards.FILE_MOD_ID = "Daily Rewards"
@@ -26,7 +26,6 @@ DailyRewards.Custom = DailyRewards.Custom or {
 }
 DailyRewards.Custom.handlers = DailyRewards.Custom.handlers or {}
 DailyRewards.Custom.definitions = DailyRewards.Custom.definitions or {}
-DailyRewards.TraitCache = DailyRewards.TraitCache or nil
 
 DailyRewards.Config = {
 	enabled = true,
@@ -99,90 +98,9 @@ function Shared.DateKeyCompare(a, b)
 	return DateTimeUtility.compareDateKeys(a, b)
 end
 
-function Shared.GetTraitInfo(traitType)
-	traitType = trim(traitType)
-	if traitType == "" or not TraitFactory or not TraitFactory.getTrait then
-		return nil
-	end
-
-	local trait = TraitFactory.getTrait(traitType)
-	if not trait then
-		return nil
-	end
-
-	local cost = trait.getCost and (trait:getCost() or 0) or 0
-	return {
-		type = tostring(trait:getType() or traitType),
-		label = trait:getLabel(),
-		description = trait:getDescription(),
-		cost = cost,
-		positive = cost >= 0,
-	}
-end
-
-function Shared.GetTraitConflictTypes(traitType)
-	local trait = TraitFactory and TraitFactory.getTrait and TraitFactory.getTrait(trim(traitType)) or nil
-	local result = {}
-	if not trait or not trait.getMutuallyExclusiveTraits then
-		return result
-	end
-
-	local conflicts = trait:getMutuallyExclusiveTraits()
-	if not conflicts then
-		return result
-	end
-
-	for index = 0, conflicts:size() - 1 do
-		local conflictType = trim(conflicts:get(index))
-		if conflictType ~= "" then
-			result[#result + 1] = conflictType
-		end
-	end
-
-	table.sort(result)
-	return result
-end
-
-function Shared.GetTraitList()
-	if DailyRewards.TraitCache then
-		return DailyRewards.TraitCache
-	end
-
-	local result = {}
-	local traitList = TraitFactory and TraitFactory.getTraits and TraitFactory.getTraits() or nil
-	if not traitList then
-		return result
-	end
-
-	for index = 0, traitList:size() - 1 do
-		local trait = traitList:get(index)
-		local traitType = trait and trim(trait:getType()) or ""
-		if
-			trait
-			and traitType ~= ""
-			and ((trait:isRemoveInMP() and not Globals.isClient) or not trait:isRemoveInMP())
-		then
-			local cost = trait:getCost() or 0
-			result[#result + 1] = {
-				type = traitType,
-				label = trait:getLabel(),
-				description = trait:getDescription(),
-				cost = cost,
-				positive = cost >= 0,
-			}
-		end
-	end
-
-	table.sort(result, function(a, b)
-		if a.positive ~= b.positive then
-			return a.positive and not b.positive
-		end
-		return tostring(a.label):lower() < tostring(b.label):lower()
-	end)
-
-	DailyRewards.TraitCache = result
-	return result
-end
+Shared.GetTraitInfo = TraitUtils.getInfo
+Shared.GetTraitConflictTypes = TraitUtils.getConflictTypes
+Shared.GetTraitList = TraitUtils.getList
 
 function Shared.NormalizeRewards(rewards)
 	rewards = type(rewards) == "table" and rewards or {}

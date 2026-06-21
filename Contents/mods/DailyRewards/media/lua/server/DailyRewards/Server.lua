@@ -101,39 +101,7 @@ local function grantXpReward(player, reward, summaries, errors)
 end
 
 local function grantTraitReward(player, reward, summaries, errors)
-	if not player or not player.getTraits then
-		errors[#errors + 1] = "Player traits unavailable"
-		return
-	end
-
-	local traitInfo = Shared.GetTraitInfo(reward.type or reward.trait)
-	if not traitInfo then
-		errors[#errors + 1] = "Invalid trait reward " .. tostring(reward.type or reward.trait)
-		return
-	end
-
-	local traits = player:getTraits()
-	local conflictTypes = Shared.GetTraitConflictTypes(traitInfo.type)
-	for i = 1, #conflictTypes do
-		local conflictType = conflictTypes[i]
-		if traits:contains(conflictType) then
-			local conflictInfo = Shared.GetTraitInfo(conflictType)
-			errors[#errors + 1] = string.format(
-				"%s conflicts with %s",
-				traitInfo.label,
-				conflictInfo and conflictInfo.label or conflictType
-			)
-			return
-		end
-	end
-
-	if traits:contains(traitInfo.type) then
-		summaries[#summaries + 1] = string.format("Trait %s (already had it)", traitInfo.label)
-		return
-	end
-
-	traits:add(traitInfo.type)
-	summaries[#summaries + 1] = string.format("Trait %s", traitInfo.label)
+	GrantUtils.grantTrait(player, reward.type or reward.trait, summaries, errors)
 end
 
 local function grantCustomReward(player, reward, context, summaries, errors)

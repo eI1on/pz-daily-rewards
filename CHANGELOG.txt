@@ -1,0 +1,10 @@
+21/06/2026
+Hotfix 
+
+[list]
+[*]Fixed non-admin players being able to access the Admin View in multiplayer.
+[*]Simplified the non-admin header to show a correctly positioned Refresh button.
+[*]Improved responsive day grids and stopped reward icons overflowing scrollable lists.
+[*]Fixed custom reward parameter parsing and improved trait reward validation.
+[*]Improved general UI and reward-system reliability.
+[/list]
